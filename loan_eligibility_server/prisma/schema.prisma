@@ -1,0 +1,146 @@
+generator client {
+    provider             = "prisma-client-py"
+    recursive_type_depth = 5
+    interface            = "sync"
+}
+
+datasource db {
+    provider  = "postgresql"
+    url       = env("DATABASE_URL")
+    directUrl = env("DIRECT_URL")
+    // directUrl   = env("RENDER_DATABASE_URL")
+    // url   = env("RENDER_DATABASE_URL")
+}
+
+// User model for authentication and basic info
+model User {
+    id            String          @id @default(uuid())
+    email         String          @unique
+    password      String
+    createdAt     DateTime        @default(now())
+    updatedAt     DateTime        @updatedAt
+    profile       Profile?
+    creditAssessmentsInitiated CreditAssessment[] @relation("scoreduser")
+    creditAssessmentsScored   CreditAssessment[] @relation("scorer")
+}
+
+// Extended user profile with demographic info
+model Profile {
+    id              String   @id @default(uuid())
+    userId          String   @unique
+    user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+    fullName        String?
+    nationalId      String?  @unique
+    gender          Gender?
+    maritalStatus   MaritalStatus?
+    dependents      Int?
+    education       Education?
+    employmentStatus EmploymentStatus?
+    income          Float?
+    coApplicantIncome Float?
+    creditHistory   Boolean?
+    // New fields for credit history assessment
+    bankTransactions TransactionFrequency?
+    lendingHistory  LendingFrequency?
+    loanPurpose     LoanPurpose?
+    propertyArea    PropertyArea?
+    createdAt       DateTime @default(now())
+    updatedAt       DateTime @updatedAt
+}
+
+// Credit assessment model (previously LoanApplication)
+model CreditAssessment {
+    id               String          @id @default(uuid())
+    scoreduserId      String
+    scoreduser        User            @relation("scoreduser", fields: [scoreduserId], references: [id])
+    scorerId         String?
+    scorer           User?           @relation("scorer", fields: [scorerId], references: [id])
+    amount           Float
+    term             Int             // Loan term in months
+    gender           Gender
+    maritalStatus    MaritalStatus
+    dependents       Int
+    education        Education
+    employmentStatus EmploymentStatus
+    income           Float
+    coApplicantIncome Float
+    creditHistory    Boolean
+    propertyArea     PropertyArea
+    score            Float?          // ML model score
+    eligible         Boolean?        // Eligibility status per ML model
+    decisionStatus   DecisionStatus? // Final decision by scorer
+    awardedAmount    Float?          // Actual amount awarded (may differ from requested)
+    dueDate          DateTime?       // When the loan is due
+    outcomeStatus    LoanOutcome?    // Whether loan was paid, defaulted, etc.
+    notes            String?         // Additional notes from scorer
+    createdAt        DateTime        @default(now())
+    updatedAt        DateTime        @updatedAt
+}
+
+// Enum types for various fields
+enum Gender {
+    MALE
+    FEMALE
+    OTHER
+}
+
+enum MaritalStatus {
+    SINGLE
+    MARRIED
+    DIVORCED
+    WIDOWED
+}
+
+enum Education {
+    GRADUATE
+    NOT_GRADUATE
+}
+
+enum EmploymentStatus {
+    EMPLOYED
+    SELF_EMPLOYED
+    UNEMPLOYED
+    STUDENT
+}
+
+enum PropertyArea {
+    URBAN
+    SEMIURBAN
+    RURAL
+}
+
+enum DecisionStatus {
+    PENDING
+    AWARDED
+    DECLINED
+    AWARDED_AND_TAKEN
+}
+
+enum LoanOutcome {
+    IN_PROGRESS
+    PAID
+    DEFAULTED
+}
+
+// New enum types for credit history assessment
+enum TransactionFrequency {
+    NONE
+    LESS_THAN_5
+    OVER_5
+}
+
+enum LendingFrequency {
+    NONE
+    LESS_THAN_5
+    OVER_5
+}
+
+enum LoanPurpose {
+    BUSINESS_INVESTMENT
+    RENTS_AND_BILLS
+    CAR_PURCHASE
+    BUILDING_PURCHASE
+    EDUCATION
+    MEDICAL_EMERGENCY
+    OTHER
+}

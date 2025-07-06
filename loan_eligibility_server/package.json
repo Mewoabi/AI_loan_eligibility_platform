@@ -1,0 +1,11 @@
+{
+    "name": "prisma-client",
+    "version": "1.0.0",
+    "scripts": {
+      "generate": "prisma generate"
+    },
+    "devDependencies": {
+      "prisma": "^5.0.0"
+    }
+  }
+  

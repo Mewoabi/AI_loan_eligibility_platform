@@ -1,0 +1,39 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@layer components {
+  .form-input-base {
+    @apply h-11 px-3 py-2 border border-gray-300 rounded-md shadow-sm text-sm bg-white;
+    @apply focus:border-indigo-500 focus:ring-2 focus:ring-indigo-400 focus:outline-none;
+    @apply transition-all duration-200;
+    border-width: 1px;
+    box-shadow: none;
+  }
+
+  .form-input-base:focus {
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.18);
+    /* indigo-500 glow */
+    border-color: #6366f1;
+  }
+
+  .input-with-icon {
+    @apply pl-7;
+  }
+
+  input[type="checkbox"] {
+    @apply h-4 w-4 text-indigo-600 border-gray-300 rounded;
+    @apply focus:ring-2 focus:ring-indigo-500 focus:outline-none;
+    @apply transition-all duration-200;
+  }
+
+  select {
+    @apply appearance-none bg-white;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 0.5rem center;
+    background-repeat: no-repeat;
+    background-size: 1.5em 1.5em;
+    padding-right: 2.5rem;
+    -webkit-print-color-adjust: exact;
+  }
+}

@@ -1,0 +1,62 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Virtual environment
+env/
+venv/
+ENV/
+.venv/
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints
+
+# VS Code settings
+.vscode/
+
+# PyCharm settings
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Model files
+*.pkl
+*.joblib
+*.h5
+*.sav
+loan_elig_predictor*
+
+# Prisma
+prisma/migrations/
+
+# Test output
+*.log
+*.coverage
+htmlcov/
+
+# Environment variables
+.env
+.env.*
+
+# Node modules (if any JS tooling)
+node_modules/
+
+# Docker
+*.pid
+
+# Misc
+*.bak
+*.swp
+*.tmp
+
+# Ignore backup files
+*~
+
+# Ignore render.yaml deployment logs
+render.yaml 
