@@ -15,7 +15,7 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Install Node.js dependencies for Prisma CLI
-COPY package.json package-lock.json ./
+COPY package.json ./
 RUN npm install
 
 # Copy everything else
