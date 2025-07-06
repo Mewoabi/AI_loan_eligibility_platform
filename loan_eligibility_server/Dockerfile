@@ -22,7 +22,7 @@ RUN npm install
 COPY . .
 
 # Generate Prisma client
-RUN npx prisma generate
+RUN python3 -m prisma generate
 
 # Expose port
 EXPOSE 10000
