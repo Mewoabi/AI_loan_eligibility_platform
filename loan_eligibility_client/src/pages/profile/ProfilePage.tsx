@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
 import { useData } from '../../context/DataContext';
 
 // Types for profile form values
@@ -22,7 +21,6 @@ type ProfileFormValues = {
 };
 
 const ProfilePage: React.FC = () => {
-  const { user } = useAuth();
   const navigate = useNavigate();
   const { profile, loading, error, updateProfile } = useData();
   const [isSaving, setIsSaving] = useState(false);

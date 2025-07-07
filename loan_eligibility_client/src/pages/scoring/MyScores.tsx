@@ -4,7 +4,6 @@ import { useAuth } from '../../context/AuthContext';
 import { useData } from '../../context/DataContext';
 import { useToast } from '../../context/toastContext';
 
-import { Gender, MaritalStatus, Education, EmploymentStatus, PropertyArea, DecisionStatus, LoanOutcome } from '../../types/enums';
 
 const MyScores: React.FC = () => {
   const { user } = useAuth();

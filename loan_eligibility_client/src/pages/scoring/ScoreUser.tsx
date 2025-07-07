@@ -75,7 +75,7 @@ const ScoreUser: React.FC = () => {
   const [scoreResult, setScoreResult] = useState<LoanPredictionResult | null>(null);
   const [showManualEntry, setShowManualEntry] = useState(false);
   const { showToast } = useToast()
-  const { users, loading: dataLoading, error: dataError, saveScore } = useData()
+  const { users, saveScore } = useData()
   const { user } = useAuth()
   const [decisionSaving, setDecisionSaving] = useState(false)
   const [showResults, setShowResults] = useState(false)

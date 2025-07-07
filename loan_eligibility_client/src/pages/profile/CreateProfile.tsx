@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
 import { useData } from '../../context/DataContext';
 import { useToast } from '../../context/toastContext';
 import { Gender, MaritalStatus, Education, EmploymentStatus, PropertyArea } from '../../types/enums';
@@ -24,7 +23,6 @@ interface ProfileFormData {
 
 const CreateProfile: React.FC = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
   const { createProfile, loading } = useData();
   const { showToast } = useToast();
   

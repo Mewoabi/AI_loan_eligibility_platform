@@ -18,8 +18,6 @@ import MyScores from './pages/scoring/MyScores'
 import ScoreDetails from './pages/scoring/ScoreDetails'
 import ScoreHistory from './pages/scoring/ScoreHistory'
 import ScoreUser from './pages/scoring/ScoreUser'
-import ToastDemo from './components/ToastDemo'
-import UsersDemo from './components/UsersDemo'
 
 // Protected route component to handle authentication
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {

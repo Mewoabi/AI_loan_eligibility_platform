@@ -53,7 +53,7 @@ type ScoreHistoryItem = {
 
 const ScoreHistory: React.FC = () => {
   const { user } = useAuth();
-  const { myScores, scoresOnMe, loading, error: dataError, getUserById } = useData();
+  const { myScores, scoresOnMe, getUserById } = useData();
   const [allScores, setAllScores] = useState<ScoreHistoryItem[]>([]);
   const [filteredScores, setFilteredScores] = useState<ScoreHistoryItem[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -64,6 +64,7 @@ const ScoreHistory: React.FC = () => {
   const { getUser } = useUsers();
 
   useEffect(() => {
+    setError(null);
     if (!user) return;
     
     const myScoresWithType = myScores.map((score: any) => ({
