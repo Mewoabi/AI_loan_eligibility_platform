@@ -1,5 +1,4 @@
 import os
-import jwt
 import joblib
 import numpy as np
 import pandas as pd
@@ -17,7 +16,7 @@ import joblib
 import pandas as pd
 import os
 from pathlib import Path
-import jwt
+import jwt  # PyJWT for JWT operations
 from passlib.context import CryptContext
 from loanModel import (
     UserCreate, UserResponse, Token, TokenData, ProfileCreate, ProfileResponse,
@@ -86,17 +85,11 @@ def get_db():
         db.connect()
         yield db
     except Exception as e:
-        # Log the error and raise an HTTP exception that will be picked up by the frontend
-        print(f"Database connection error: {e}")
-        raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="Database connection failed. Please try again later."
-        )
+        raise HTTPException(status_code=500, detail=str(e))
     finally:
         try:
             db.disconnect()
         except Exception as disconnect_error:
-            # Log disconnect errors but don't raise them to avoid masking the original error
             print(f"Database disconnect error: {disconnect_error}")
 
 # Authentication utilities
