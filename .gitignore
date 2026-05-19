@@ -1,0 +1,18 @@
+# Local / dev-only artifacts (not part of the shipped application)
+
+# Server utilities
+loan_eligibility_server/verify_endpoints.py
+loan_eligibility_server/seed_demo_data.py
+loan_eligibility_server/test_scoring_endpoints.py
+loan_eligibility_server/main_backup.py
+
+# Client boilerplate & internal docs
+loan_eligibility_client/README.md
+loan_eligibility_client/src/context/DATA_README.md
+loan_eligibility_client/src/context/TOAST_README.md
+loan_eligibility_client/src/context/USERS_README.md
+
+# Client dev/demo components (not routed in production)
+loan_eligibility_client/src/components/ToastDemo.tsx
+loan_eligibility_client/src/components/UsersDemo.tsx
+loan_eligibility_client/src/components/DataContextTest.tsx

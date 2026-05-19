@@ -59,4 +59,10 @@ node_modules/
 *~
 
 # Ignore render.yaml deployment logs
-render.yaml 
+render.yaml
+
+# Dev-only scripts (see repo root .gitignore)
+verify_endpoints.py
+seed_demo_data.py
+test_scoring_endpoints.py
+main_backup.py

@@ -16,8 +16,7 @@ Built as a full-stack web application with a React frontend and a FastAPI backen
 - [Getting started](#getting-started)
   - [Backend setup](#backend-setup)
   - [Frontend setup](#frontend-setup)
-  - [Seed demo data](#seed-demo-data)
-- [Demo credentials](#demo-credentials)
+  - [Demo credentials](#demo-credentials)
 - [Environment variables](#environment-variables)
 - [API reference](#api-reference)
 - [Credit scoring model](#credit-scoring-model)
@@ -113,7 +112,7 @@ AI_loan_eligibility_platform/
 └── loan_eligibility_server/          # FastAPI backend
     ├── main.py                       # API entry point
     ├── loanModel.py                  # Pydantic request/response models
-    ├── seed_demo_data.py             # Demo data seeder
+    ├── db.py                         # Database connection helpers
     ├── dev.ps1                       # Local dev helper (Windows)
     ├── prisma/schema.prisma          # Database schema
     ├── requirements.txt
@@ -183,17 +182,6 @@ npm run dev
 
 The client runs at **http://localhost:5173**.
 
-### Seed demo data
-
-With the API running, populate the database with demo users, profiles, and credit assessments:
-
-```powershell
-cd loan_eligibility_server
-.\venv\Scripts\python.exe seed_demo_data.py
-```
-
-The seeder is **idempotent** — re-running it skips accounts and assessments that already exist. See [Demo credentials](#demo-credentials) below for login details.
-
 ---
 
 ## Demo credentials
@@ -233,7 +221,7 @@ Search for these users when performing scoring:
 | `claire.mbah@demo.scoresure.app` | Claire Mbah |
 | `eric.fotso@demo.scoresure.app` | Eric Fotso |
 
-The seeded dataset includes **18 credit assessments** spanning:
+When demo data is present in your database, you can explore assessments spanning:
 
 | Decision status | Outcome | Purpose |
 |----------------|---------|---------|
@@ -371,8 +359,6 @@ Ensure `DATABASE_URL`, the ML model file, and any required migrations are availa
 | `npm run build` | `loan_eligibility_client` | Production build |
 | `uvicorn main:app --reload` | `loan_eligibility_server` | Start API with hot reload |
 | `.\dev.ps1` | `loan_eligibility_server` | Generate Prisma client + start API (Windows) |
-| `python seed_demo_data.py` | `loan_eligibility_server` | Seed demo users and assessments |
-| `python verify_endpoints.py` | `loan_eligibility_server` | Smoke-test all API endpoints |
 | `prisma migrate dev` | `loan_eligibility_server` | Apply migrations |
 | `prisma generate` | `loan_eligibility_server` | Regenerate Prisma Python client |
 
