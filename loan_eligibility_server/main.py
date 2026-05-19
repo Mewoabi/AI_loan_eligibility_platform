@@ -1,10 +1,13 @@
+import asyncio
 import os
+import time
 import joblib
 import numpy as np
 import pandas as pd
-from typing import Union, Optional, List
-from fastapi import FastAPI, Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from typing import Union, Optional, List, Tuple
+from fastapi import FastAPI, Depends, HTTPException, Request, status
+from fastapi.responses import JSONResponse
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer, OAuth2PasswordRequestForm
 from fastapi.middleware.cors import CORSMiddleware
 from prisma import Prisma
 from prisma.models import User, Profile, CreditAssessment
@@ -24,15 +27,33 @@ from loanModel import (
     LoanPredictionResponse, Gender, MaritalStatus, Education, EmploymentStatus,
     PropertyArea, DecisionStatus, LoanOutcome, UserSearchResult, ProfileSummary,
     TransactionFrequency, LendingFrequency, LoanPurpose, DashboardStats, RecentScore,
+    HealthResponse,
     # Keep legacy imports for backward compatibility
     LoanApplicationCreate, LoanApplicationUpdate, LoanApplicationResponse
 )
+from db import configure_database_url, connect_db, raise_db_http_exception
 
-# Initialize FastAPI app
+configure_database_url()
+
+REQUEST_TIMEOUT_SEC = float(os.getenv("REQUEST_TIMEOUT_SEC", "60"))
+
+# Initialize FastAPI app (tag order controls Swagger UI section order)
 app = FastAPI(
     title="Loan Eligibility API",
     description="AI-Powered Loan Eligibility Scoring and Tracking System",
-    version="1.0.0"
+    version="1.0.0",
+    openapi_tags=[
+        {"name": "Health", "description": "Liveness and readiness probes"},
+        {
+            "name": "Authentication",
+            "description": "Register, then POST /auth/token to get accessToken. Paste that JWT in Authorize (Bearer).",
+        },
+        {"name": "Users", "description": "Current user and search"},
+        {"name": "Profiles", "description": "Borrower profile management"},
+        {"name": "Loans", "description": "ML loan eligibility prediction"},
+        {"name": "Credit Scoring", "description": "Save and manage credit assessments"},
+        {"name": "Dashboard", "description": "Aggregated statistics"},
+    ],
 )
 
 # Add CORS middleware
@@ -44,7 +65,29 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
+@app.middleware("http")
+async def request_timeout_middleware(request: Request, call_next):
+    """Cap how long any HTTP request may run (including slow DB wake-up)."""
+    try:
+        return await asyncio.wait_for(call_next(request), timeout=REQUEST_TIMEOUT_SEC)
+    except asyncio.TimeoutError:
+        return JSONResponse(
+            status_code=504,
+            content={
+                "detail": (
+                    f"Request timed out after {int(REQUEST_TIMEOUT_SEC)} seconds. "
+                    "Please try again."
+                )
+            },
+        )
+
+
 model = None
+
+# Health check: retry DB on cold start (e.g. Neon sleep)
+HEALTH_DB_MAX_ATTEMPTS = int(os.getenv("HEALTH_DB_MAX_ATTEMPTS", "5"))
+HEALTH_DB_RETRY_DELAY_SEC = float(os.getenv("HEALTH_DB_RETRY_DELAY_SEC", "2.0"))
 
 
 @app.on_event("startup")
@@ -70,7 +113,8 @@ async def startup_event():
 
 # Security utilities
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+# Swagger Authorize: paste JWT from POST /auth/token (not username/password in the modal)
+http_bearer = HTTPBearer()
 # In production, use environment variable
 SECRET_KEY = "THIS IS THE KEY FOR THE FINAL YEAR PROJECT VERSION1.000 WITH SOME ADDITIONAL 12-3492840-23"
 ALGORITHM = "HS256"
@@ -82,15 +126,79 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 60*24  # 24 hours
 def get_db():
     db = Prisma()
     try:
-        db.connect()
+        connect_db(db)
         yield db
+    except HTTPException:
+        raise
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise_db_http_exception(e)
     finally:
         try:
             db.disconnect()
         except Exception as disconnect_error:
             print(f"Database disconnect error: {disconnect_error}")
+
+
+def check_database_connectivity(
+    max_attempts: int = HEALTH_DB_MAX_ATTEMPTS,
+    delay_seconds: float = HEALTH_DB_RETRY_DELAY_SEC,
+) -> Tuple[bool, str, int]:
+    """
+    Verify PostgreSQL is reachable. Retries help wake serverless DBs from sleep.
+    Returns (connected, last_error_message, attempts_used).
+    """
+    last_error = ""
+    for attempt in range(1, max_attempts + 1):
+        db = Prisma()
+        try:
+            connect_db(db)
+            db.query_raw("SELECT 1")
+            return True, "", attempt
+        except HTTPException as e:
+            last_error = str(e.detail)
+            if attempt < max_attempts:
+                time.sleep(delay_seconds)
+        except Exception as e:
+            last_error = str(e)
+            if attempt < max_attempts:
+                time.sleep(delay_seconds)
+        finally:
+            try:
+                db.disconnect()
+            except Exception:
+                pass
+    return False, last_error, max_attempts
+
+
+@app.get("/health", response_model=HealthResponse, tags=["Health"])
+def health_check():
+    """
+    Liveness/readiness probe. Pings the database with retries to handle cold starts
+    (e.g. Neon waking from sleep). Returns 503 until the database responds.
+    """
+    db_connected, db_error, db_attempts = check_database_connectivity()
+    model_loaded = model is not None
+
+    if not db_connected:
+        body = HealthResponse(
+            status="unhealthy",
+            modelLoaded=model_loaded,
+            database="disconnected",
+            databaseAttempts=db_attempts,
+            detail=db_error or "Database unreachable after retries",
+        )
+        return JSONResponse(status_code=503, content=body.model_dump(mode="json"))
+
+    overall_status = "healthy" if model_loaded else "degraded"
+    body = HealthResponse(
+        status=overall_status,
+        modelLoaded=model_loaded,
+        database="connected",
+        databaseAttempts=db_attempts,
+        detail=None if model_loaded else "ML model not loaded",
+    )
+    return body
+
 
 # Authentication utilities
 
@@ -114,14 +222,17 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     return encoded_jwt
 
 
-async def get_current_user(token: str = Depends(oauth2_scheme), db: Prisma = Depends(get_db)):
+async def get_current_user(
+    credentials: HTTPAuthorizationCredentials = Depends(http_bearer),
+    db: Prisma = Depends(get_db),
+):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"},
     )
     try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        payload = jwt.decode(credentials.credentials, SECRET_KEY, algorithms=[ALGORITHM])
         user_id: str = payload.get("sub")
         print(payload, 'trying to decode token')
         if user_id is None:
@@ -297,6 +408,12 @@ def register_user(user: UserCreate, db: Prisma = Depends(get_db)):
 
 @app.post("/auth/token", response_model=Token, tags=["Authentication"])
 def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db: Prisma = Depends(get_db)):
+    """
+    Public login. Use **username** = email and **password** = account password.
+
+    Copy `accessToken` from the response, click **Authorize** at the top of Swagger,
+    and paste the JWT into the Bearer token field (do not include the word \"Bearer\").
+    """
     user = db.user.find_unique(where={"email": form_data.username})
     if not user or not verify_password(form_data.password, user.password):
         raise HTTPException(
@@ -1076,7 +1193,7 @@ def delete_score(
     if assessment.scoreduserId != current_user.id:
         raise HTTPException(
             status_code=403, detail="Not authorized to delete this assessment")
-      # Delete the assessment
+
     db.creditassessment.delete(where={"id": scoreId})
 
     return {"message": "Credit assessment deleted successfully"}
@@ -1177,10 +1294,3 @@ def get_dashboard_stats(
         pendingLoans=pending_loans,
         recentScores=recent_scores
     )
-
-# Health check endpoint
-
-
-@app.get("/health", tags=["Health"])
-def health_check():
-    return {"status": "healthy", "model_loaded": model is not None}

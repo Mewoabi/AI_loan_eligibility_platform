@@ -1,9 +1,18 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { performCreditScore } from '../../services/api';
+import { performCreditScore, getApiErrorMessage } from '../../services/api';
 import Footer from '../../components/Footer';
 import type { LoanPredictionResult } from './ScoreUser';
 import { useToast } from '../../context/toastContext';
+import { FormPageLayout } from '../../layouts/FormPageLayout';
+import { Callout } from '../../components/ui';
+
+const FORM_SECTIONS = [
+  { id: 'section-personal', label: 'Personal' },
+  { id: 'section-financial', label: 'Financial' },
+  { id: 'section-loan', label: 'Loan' },
+  { id: 'section-credit', label: 'Credit History' },
+];
 
 interface ScoreData {
   gender: string;
@@ -137,14 +146,9 @@ const QuickScore: React.FC = () => {
       const result: LoanPredictionResult = processScoreResult(response.data as LoanPredictionResult)
       console.log(result)
       setResult(result);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Scoring failed:', error);
-      // showToast('Failed to perform scoring. Please check your inputs and try again.', 'error');
-      if (Array.isArray(error.response.data.detail)) {
-        showToast(`${error.response.data.detail[0].loc[1]} ${error.response.data.detail[0].msg}`, 'error');
-      } else {
-        if (error.response.data.detail && typeof error.response.data.detail === 'string') showToast(error.response.data.detail)
-      }
+      showToast(getApiErrorMessage(error, 'Failed to perform scoring. Please check your inputs.'), 'error');
     } finally {
       setIsLoading(false);
     }
@@ -172,33 +176,26 @@ const QuickScore: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-sky-50 dark:from-gray-900 dark:to-gray-800 transition-colors duration-300">
-      <div className="max-w-4xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2 transition-colors duration-300">
-            Quick Credit Score
-          </h1>
-          <p className="text-gray-600 dark:text-gray-300 max-w-2xl mx-auto transition-colors duration-300">
-            Get an instant credit score assessment. This is a quick evaluation that won't be saved to your account.
-          </p>
-          <div className="mt-4 p-4 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-lg transition-colors duration-300">
-            <p className="text-blue-800 dark:text-blue-200 text-sm transition-colors duration-300">
-              💡 <strong>Want to track your scores?</strong>
-              <Link to="/register" className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium ml-1 transition-colors duration-300">
-                Create an account
-              </Link> to save results and build your credit history.
-            </p>
-          </div>
-        </div>
+    <FormPageLayout
+      title="Quick Credit Score"
+      description="Get an instant credit score assessment. This evaluation is not saved to your account."
+      sections={FORM_SECTIONS}
+    >
+        <Callout variant="info" className="mb-6">
+          <strong>Want to track your scores?</strong>{' '}
+          <Link to="/register" className="text-sky-600 dark:text-sky-400 font-semibold hover:underline">
+            Create an account
+          </Link>{' '}
+          to save results and build your credit history.
+        </Callout>
 
         {!result ? (
-          <div className="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6 transition-colors duration-300">
+          <div className="surface-card p-6 transition-colors duration-300">
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Personal Information */}
-                <div className="md:col-span-2">
-                  <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4 pb-2 border-b border-gray-200 dark:border-gray-600 transition-colors duration-300">
+                <div className="md:col-span-2 form-section-anchor" id="section-personal">
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 pb-2 border-b border-gray-200/80 dark:border-gray-700/80">
                     Personal Information
                   </h3>
                 </div>
@@ -208,7 +205,7 @@ const QuickScore: React.FC = () => {
                   <select
                     value={scoreData.gender}
                     onChange={(e) => handleInputChange('gender', e.target.value)}
-                    className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-sky-500 focus:border-transparent transition-colors duration-300"
+                    className="input-field"
                     required
                   >
                     <option value="">Select Gender</option>
@@ -222,7 +219,7 @@ const QuickScore: React.FC = () => {
                   <select
                     value={scoreData.maritalStatus}
                     onChange={(e) => handleInputChange('maritalStatus', e.target.value)}
-                    className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-sky-500 focus:border-transparent transition-colors duration-300"
+                    className="input-field"
                     required
                   >
                     <option value="">Select Status</option>
@@ -241,7 +238,7 @@ const QuickScore: React.FC = () => {
                     max="10"
                     value={scoreData.dependents}
                     onChange={(e) => handleInputChange('dependents', parseInt(e.target.value) || 0)}
-                    className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-sky-500 focus:border-transparent transition-colors duration-300"
+                    className="input-field"
                     required
                   />
                 </div>
@@ -251,7 +248,7 @@ const QuickScore: React.FC = () => {
                   <select
                     value={scoreData.education}
                     onChange={(e) => handleInputChange('education', e.target.value)}
-                    className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-sky-500 focus:border-transparent transition-colors duration-300"
+                    className="input-field"
                     required
                   >
                     <option value="">Select Education</option>
@@ -261,8 +258,8 @@ const QuickScore: React.FC = () => {
                 </div>
 
                 {/* Financial Information */}
-                <div className="md:col-span-2 mt-8">
-                  <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4 pb-2 border-b border-gray-200 dark:border-gray-600 transition-colors duration-300">
+                <div className="md:col-span-2 mt-8 form-section-anchor" id="section-financial">
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 pb-2 border-b border-gray-200/80 dark:border-gray-700/80">
                     Financial Information
                   </h3>
                 </div>
@@ -272,7 +269,7 @@ const QuickScore: React.FC = () => {
                   <select
                     value={scoreData.employmentStatus}
                     onChange={(e) => handleInputChange('employmentStatus', e.target.value)}
-                    className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-sky-500 focus:border-transparent transition-colors duration-300"
+                    className="input-field"
                     required
                   >
                     <option value="">Select Employment</option>
@@ -290,7 +287,7 @@ const QuickScore: React.FC = () => {
                     step="100"
                     value={scoreData.income}
                     onChange={(e) => handleInputChange('income', parseFloat(e.target.value) || 0)}
-                    className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-sky-500 focus:border-transparent transition-colors duration-300"
+                    className="input-field"
                     required
                   />
                 </div>
@@ -303,7 +300,7 @@ const QuickScore: React.FC = () => {
                     step="100"
                     value={scoreData.coApplicantIncome}
                     onChange={(e) => handleInputChange('coApplicantIncome', parseFloat(e.target.value) || 0)}
-                    className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-sky-500 focus:border-transparent transition-colors duration-300"
+                    className="input-field"
                   />
                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 transition-colors duration-300">Leave as 0 if no co-applicant</p>
                 </div>
@@ -313,7 +310,7 @@ const QuickScore: React.FC = () => {
                   <select
                     value={scoreData.propertyArea}
                     onChange={(e) => handleInputChange('propertyArea', e.target.value)}
-                    className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-sky-500 focus:border-transparent transition-colors duration-300"
+                    className="input-field"
                     required
                   >
                     <option value="">Select Area</option>
@@ -324,8 +321,8 @@ const QuickScore: React.FC = () => {
                 </div>
 
                 {/* Loan Information */}
-                <div className="md:col-span-2 mt-8">
-                  <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4 pb-2 border-b border-gray-200 dark:border-gray-600 transition-colors duration-300">
+                <div className="md:col-span-2 mt-8 form-section-anchor" id="section-loan">
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 pb-2 border-b border-gray-200/80 dark:border-gray-700/80">
                     Loan Information
                   </h3>
                 </div>
@@ -338,7 +335,7 @@ const QuickScore: React.FC = () => {
                     step="100"
                     value={scoreData.loanAmount}
                     onChange={(e) => handleInputChange('loanAmount', parseFloat(e.target.value) || 0)}
-                    className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-sky-500 focus:border-transparent transition-colors duration-300"
+                    className="input-field"
                     required
                   />
                 </div>
@@ -348,7 +345,7 @@ const QuickScore: React.FC = () => {
                   {/* <select
                     value={scoreData.loanTerm}
                     onChange={(e) => handleInputChange('loanTerm', parseInt(e.target.value))}
-                    className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-sky-500 focus:border-transparent transition-colors duration-300"
+                    className="input-field"
                     required
                   >
                     <option value={12}>12 months</option>
@@ -367,7 +364,7 @@ const QuickScore: React.FC = () => {
                     // step="100"
                     value={scoreData.loanTerm || 1}
                     onChange={(e) => handleInputChange('loanTerm', parseInt(e.target.value) || 0)}
-                    className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-sky-500 focus:border-transparent transition-colors duration-300"
+                    className="input-field"
                     required
                   />
                 </div>
@@ -387,9 +384,9 @@ const QuickScore: React.FC = () => {
                 {/* Loan Information */}
               </div>
               {/* Credit History Assessment Section */}
-              <div className="space-y-6 mt-8">
-                <div className="border-b border-gray-200 dark:border-gray-600 pb-4 transition-colors duration-300">
-                  <h3 className="text-lg font-bold text-gray-900 dark:text-white flex items-center transition-colors duration-300">
+              <div className="space-y-6 mt-8 form-section-anchor" id="section-credit">
+                <div className="border-b border-gray-200/80 dark:border-gray-700/80 pb-4">
+                  <h3 className="text-lg font-bold text-gray-900 dark:text-white flex items-center">
                     <div className="w-8 h-8 bg-purple-100 dark:bg-purple-900/50 rounded-lg flex items-center justify-center mr-3 transition-colors duration-300">
                       <svg className="w-4 h-4 text-purple-600 dark:text-purple-400 transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
@@ -410,7 +407,7 @@ const QuickScore: React.FC = () => {
                     <select
                       value={scoreData.bankTransactions || 'NONE'}
                       onChange={(e) => handleInputChange('bankTransactions', e.target.value)}
-                      className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-sky-500 focus:border-transparent transition-colors duration-300"
+                      className="input-field"
                     >
                       <option value="NONE">None</option>
                       <option value="LESS_THAN_5">Less than 5</option>
@@ -428,7 +425,7 @@ const QuickScore: React.FC = () => {
                     <select
                       value={scoreData.lendingHistory || 'NONE'}
                       onChange={(e) => handleInputChange('lendingHistory', e.target.value)}
-                      className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-sky-500 focus:border-transparent transition-colors duration-300"
+                      className="input-field"
                     >
                       <option value="NONE">None</option>
                       <option value="LESS_THAN_5">Less than 5</option>
@@ -446,7 +443,7 @@ const QuickScore: React.FC = () => {
                     <select
                       value={scoreData.loanPurpose || 'BUSINESS_INVESTMENT'}
                       onChange={(e) => handleInputChange('loanPurpose', e.target.value)}
-                      className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-sky-500 focus:border-transparent transition-colors duration-300"
+                      className="input-field"
                     >
                       <option value="BUSINESS_INVESTMENT">Business Investment</option>
                       <option value="RENTS_AND_BILLS">Rents and Bills</option>
@@ -509,7 +506,7 @@ const QuickScore: React.FC = () => {
         ) : (
           /* Results Section */
           <div className="space-y-6">
-            <div className="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6 transition-colors duration-300">
+            <div className="surface-card p-6 transition-colors duration-300">
               <div className="text-center mb-6">
                 <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2 transition-colors duration-300">Your Credit Score Result</h2>
                 <p className="text-gray-600 dark:text-gray-300 transition-colors duration-300">Based on the information provided</p>
@@ -572,7 +569,7 @@ const QuickScore: React.FC = () => {
             </div>
 
             {/* Additional Information */}
-            <div className="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6 transition-colors duration-300">
+            <div className="surface-card p-6 transition-colors duration-300">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 transition-colors duration-300">Understanding Your Score</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm text-gray-600 dark:text-gray-300 transition-colors duration-300">
                 <div>
@@ -600,9 +597,8 @@ const QuickScore: React.FC = () => {
             </div>
           </div>
         )}
-      </div>
       <Footer />
-    </div>
+    </FormPageLayout>
   );
 };
 

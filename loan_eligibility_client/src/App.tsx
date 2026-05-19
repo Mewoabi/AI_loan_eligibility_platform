@@ -5,8 +5,8 @@ import { UsersProvider } from './context/usersContext'
 import { ToastProvider } from './context/toastContext'
 import { DataProvider, useData } from './context/DataContext'
 import LoadingOverlay from './components/LoadingOverlay'
-import './App.css'
 import Navbar from './components/Navbar'
+import { Spinner } from './components/ui'
 import Login from './pages/auth/Login'
 import Register from './pages/auth/Register'
 import QuickScore from './pages/scoring/QuickScore'
@@ -18,6 +18,7 @@ import MyScores from './pages/scoring/MyScores'
 import ScoreDetails from './pages/scoring/ScoreDetails'
 import ScoreHistory from './pages/scoring/ScoreHistory'
 import ScoreUser from './pages/scoring/ScoreUser'
+import ScoreApplications from './pages/scoring/ScoreApplications'
 
 // Protected route component to handle authentication
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -30,7 +31,11 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   }
 
   if (authLoading) {
-    return <div className="flex justify-center items-center h-screen">Loading...</div>;
+    return (
+      <div className="flex justify-center items-center h-screen app-mesh-bg">
+        <Spinner size="lg" label="Loading..." />
+      </div>
+    );
   }
 
   if (!isAuthenticated) {
@@ -43,14 +48,14 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 function App() {
   return (
     <ThemeProvider>
-      <AuthProvider>
-        <ToastProvider>
+      <ToastProvider>
+        <AuthProvider>
           <DataProvider>
             <UsersProvider>
               <Router>
-                <div className="min-h-screen bg-gradient-to-br from-slate-50 to-sky-50 dark:from-gray-900 dark:to-gray-800 transition-colors duration-300">
+                <div className="app-mesh-bg min-h-screen transition-colors duration-300">
                   <Navbar />
-                  <main>
+                  <main className="relative z-10">
                   <Routes>
                     {/* Public Routes */}
                     <Route path="/" element={<HomePage />} />
@@ -116,6 +121,14 @@ function App() {
                         </ProtectedRoute>
                       } 
                     />
+                    <Route 
+                      path="/score-applications" 
+                      element={
+                        <ProtectedRoute>
+                          <ScoreApplications />
+                        </ProtectedRoute>
+                      } 
+                    />
 
                     {/* Fallback Route */}
                     <Route path="*" element={<Navigate to="/" replace />} />
@@ -125,8 +138,8 @@ function App() {
             </Router>
             </UsersProvider>
           </DataProvider>
-        </ToastProvider>
-      </AuthProvider>
+        </AuthProvider>
+      </ToastProvider>
     </ThemeProvider>
   );
 }

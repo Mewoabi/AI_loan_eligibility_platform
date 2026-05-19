@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
 import type { ReactNode } from 'react';
-import { searchUsers } from '../services/api';
+import { searchUsers, getApiErrorMessage } from '../services/api';
 import { useAuth } from './AuthContext';
 import { useToast } from './toastContext';
 
@@ -74,9 +74,9 @@ export const UsersProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       
       setUsers(filteredUsers);
       setIsFetched(true);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Failed to fetch users:', err);
-      setError(err.response?.data?.detail || 'Failed to fetch users');
+      setError(getApiErrorMessage(err, 'Failed to fetch users'));
       setIsFetched(false);
     } finally {
       setIsLoading(false);

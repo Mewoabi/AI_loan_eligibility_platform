@@ -35,7 +35,7 @@ const ToastItem: React.FC<{ toast: Toast; onClose: (id: string) => void }> = ({ 
       case 'warning':
         return 'bg-yellow-50 border-yellow-200 text-yellow-800 dark:bg-yellow-900/50 dark:border-yellow-800 dark:text-yellow-200';
       case 'info':
-        return 'bg-blue-50 border-blue-200 text-blue-800 dark:bg-blue-900/50 dark:border-blue-800 dark:text-blue-200';
+        return 'bg-sky-50 border-sky-200 text-sky-800 dark:bg-sky-900/50 dark:border-sky-800 dark:text-sky-200';
       default:
         return 'bg-gray-50 border-gray-200 text-gray-800 dark:bg-gray-900/50 dark:border-gray-800 dark:text-gray-200';
     }

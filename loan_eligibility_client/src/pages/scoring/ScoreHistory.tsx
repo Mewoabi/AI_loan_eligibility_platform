@@ -178,7 +178,7 @@ const ScoreHistory: React.FC = () => {
   return (
     <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
       <div className="px-4 py-6 sm:px-0">
-        <div className="bg-white dark:bg-gray-800 shadow overflow-hidden sm:rounded-lg transition-colors duration-300">
+        <div className="surface-card overflow-hidden transition-colors duration-300">
           <div className="px-4 py-5 sm:px-6 bg-gradient-to-r from-sky-500 to-teal-500">
             <div className="flex justify-between items-center">
               <h3 className="text-lg leading-6 font-medium text-white">Complete Score History</h3>
@@ -285,7 +285,7 @@ const ScoreHistory: React.FC = () => {
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-600 transition-colors duration-300">
+              <tbody className="divide-y divide-gray-200/80 dark:divide-gray-700/80 transition-colors duration-300">
                 {filteredScores.map((score) => (
                   <tr key={`${score.id}-${score.type}`} className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-300">
                     <td className="px-6 py-4 whitespace-nowrap">

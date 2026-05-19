@@ -1,69 +1,67 @@
 import axios from 'axios';
+import { DEFAULT_TIMEOUT_MS, getApiErrorMessage } from './apiErrors';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
-// Create axios instance with base URL
 const api = axios.create({
   baseURL: API_URL,
+  timeout: DEFAULT_TIMEOUT_MS,
 });
-// Add request interceptor for JWT authentication
+
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
     if (token) {
-      config.headers['Authorization'] = `Bearer ${token}`;
+      config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
   },
+  (error) => Promise.reject(error)
+);
+
+api.interceptors.response.use(
+  (response) => response,
   (error) => {
+    if (axios.isAxiosError(error) && error.response?.data && typeof error.response.data === 'object') {
+      const data = error.response.data as { detail?: unknown };
+      // Keep FastAPI validation arrays intact; normalize everything else
+      if (!Array.isArray(data.detail)) {
+        data.detail = getApiErrorMessage(error, 'Something went wrong');
+      }
+    }
     return Promise.reject(error);
   }
 );
-// Authentication API calls
+
+export { getApiErrorMessage };
+
 export const registerUser = async (email: string, password: string) => {
-  try {
-    return api.post('/auth/register', { email, password });
-  } catch (error) {
-    console.log("error registering user", error)
-    throw error
-  }
+  return api.post('/auth/register', { email, password });
 };
 
 export const loginUser = async (username: string, password: string) => {
   const formData = new FormData();
   formData.append('username', username);
   formData.append('password', password);
-  try {
-    const response = await api.post('/auth/token', formData);
-    console.log('Login response:', response.data);
-    return response;
-  } catch (error) {
-    console.error('Login error:', error);
-    throw error;
-    
-  }
+  return api.post('/auth/token', formData);
 };
+
 export const getCurrentUser = async () => {
-  try {
-    return await api.get('/users/me');
-  } catch (error) {
-    console.log("something went wrong getting the current user", error)
-    throw error
-  }
+  return api.get('/users/me');
 };
-// Profile API calls
+
 export const getProfile = async () => {
   return api.get('/users/profile');
 };
-export const createProfile = async (profileData: any) => {
+
+export const createProfile = async (profileData: unknown) => {
   return api.post('/users/profile', profileData);
 };
 
-export const updateProfile = async (profileData: any) => {
+export const updateProfile = async (profileData: unknown) => {
   return api.put('/users/profile', profileData);
 };
 
-// User search and management
 export const searchUsers = async (query: string) => {
   return api.get(`/users/search?q=${encodeURIComponent(query)}`);
 };
@@ -72,12 +70,11 @@ export const getUserById = async (userId: string) => {
   return api.get(`/users/${userId}`);
 };
 
-// Credit Scoring API calls
-export const performCreditScore = async (scoreData: any) => {
+export const performCreditScore = async (scoreData: unknown) => {
   return api.post('/loans/predict', scoreData);
 };
 
-export const saveScoreResult = async (scoreData: any) => {
+export const saveScoreResult = async (scoreData: unknown) => {
   return api.post('/scoring/save', scoreData);
 };
 
@@ -93,16 +90,15 @@ export const getScoreById = async (scoreId: string) => {
   return api.get(`/scoring/${scoreId}`);
 };
 
-export const updateScoreStatus = async (scoreId: string, statusData: any) => {
+export const updateScoreStatus = async (scoreId: string, statusData: unknown) => {
   return api.put(`/scoring/${scoreId}/status`, statusData);
 };
 
-// Loan tracking API calls
-export const recordLoanTaken = async (scoreId: string, loanData: any) => {
+export const recordLoanTaken = async (scoreId: string, loanData: unknown) => {
   return api.post(`/loans/record/${scoreId}`, loanData);
 };
 
-export const updateLoanRepaymentStatus = async (loanId: string, statusData: any) => {
+export const updateLoanRepaymentStatus = async (loanId: string, statusData: unknown) => {
   return api.put(`/loans/${loanId}/repayment`, statusData);
 };
 
@@ -118,13 +114,11 @@ export const getLoanById = async (loanId: string) => {
   return api.get(`/loans/${loanId}`);
 };
 
-// Dashboard statistics
 export const getDashboardStats = async () => {
   return api.get('/dashboard/stats');
 };
 
-// Legacy API calls for backward compatibility (to be removed)
-export const predictLoanEligibility = async (loanData: any) => {
+export const predictLoanEligibility = async (loanData: unknown) => {
   return performCreditScore(loanData);
 };
 
@@ -144,11 +138,11 @@ export const getLoanApplication = async (loanId: string) => {
   return getScoreById(loanId);
 };
 
-export const updateLoanApplication = async (loanId: string, updateData: any) => {
+export const updateLoanApplication = async (loanId: string, updateData: unknown) => {
   return updateScoreStatus(loanId, updateData);
 };
 
-export const createLoanApplication = async (loanData: any) => {
+export const createLoanApplication = async (loanData: unknown) => {
   return performCreditScore(loanData);
 };
 

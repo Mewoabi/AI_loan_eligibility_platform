@@ -12,6 +12,20 @@ dist
 dist-ssr
 *.local
 
+# Environment (secrets / local API URL)
+.env
+.env.*
+!.env.example
+
+# Dev-only (see repo root .gitignore)
+README.md
+src/context/DATA_README.md
+src/context/TOAST_README.md
+src/context/USERS_README.md
+src/components/ToastDemo.tsx
+src/components/UsersDemo.tsx
+src/components/DataContextTest.tsx
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

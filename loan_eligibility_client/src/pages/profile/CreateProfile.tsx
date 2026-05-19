@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useData } from '../../context/DataContext';
+import { getApiErrorMessage } from '../../services/api';
 import { useToast } from '../../context/toastContext';
 import { Gender, MaritalStatus, Education, EmploymentStatus, PropertyArea } from '../../types/enums';
+import { AppLayout } from '../../layouts/AppLayout';
+import { Card } from '../../components/ui';
 
 interface ProfileFormData {
   fullName: string;
@@ -59,69 +62,64 @@ const CreateProfile: React.FC = () => {
       await createProfile(formData);
       showToast('Profile created successfully!', 'success');
       navigate('/profile');
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Failed to create profile:', error);
-      if (Array.isArray(error.response?.data?.detail)) {
-        showToast(`${error.response.data.detail[0].loc[1]} ${error.response.data.detail[0].msg}`, 'error');
-      } else {
-        showToast(error.response?.data?.detail || 'Failed to create profile', 'error');
-      }
+      showToast(getApiErrorMessage(error, 'Failed to create profile'), 'error');
     }
   };
 
-  return (
-    <div className="max-w-4xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-      <div className="bg-white shadow rounded-lg">
-        {/* Header */}
-        <div className="px-6 py-4 border-b border-gray-200">
-          <h1 className="text-2xl font-bold text-gray-900">Create Profile</h1>
-          <p className="text-gray-600 mt-1">
-            Complete your profile to get started with credit scoring
-          </p>
-        </div>
+  const inputClass = 'input-field';
+  const labelClass =
+    'block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5';
 
-        {/* Profile Form */}
+  return (
+    <AppLayout
+      maxWidth="lg"
+      title="Create Profile"
+      description="Complete your profile to get started with credit scoring"
+    >
+      <Card>
         <form onSubmit={handleSubmit} className="p-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Personal Information */}
             <div className="md:col-span-2">
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">Personal Information</h2>
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 transition-colors duration-300">Personal Information</h2>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className={labelClass}>
                 Full Name *
               </label>
               <input
                 type="text"
                 value={formData.fullName}
                 onChange={(e) => handleInputChange('fullName', e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 bg-white text-gray-900 focus:ring-2 focus:ring-sky-500 focus:border-transparent"
+                className={inputClass}
                 required
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className={labelClass}>
                 National ID *
               </label>
               <input
                 type="text"
                 value={formData.nationalId}
                 onChange={(e) => handleInputChange('nationalId', e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 bg-white text-gray-900 focus:ring-2 focus:ring-sky-500 focus:border-transparent"
+                className={inputClass}
                 required
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className={labelClass}>
                 Gender
               </label>
               <select
                 value={formData.gender}
                 onChange={(e) => handleInputChange('gender', e.target.value as Gender)}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 bg-white text-gray-900 focus:ring-2 focus:ring-sky-500 focus:border-transparent"
+                className={inputClass}
               >
                 <option value={Gender.MALE}>Male</option>
                 <option value={Gender.FEMALE}>Female</option>
@@ -129,13 +127,13 @@ const CreateProfile: React.FC = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className={labelClass}>
                 Marital Status
               </label>
               <select
                 value={formData.maritalStatus}
                 onChange={(e) => handleInputChange('maritalStatus', e.target.value as MaritalStatus)}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 bg-white text-gray-900 focus:ring-2 focus:ring-sky-500 focus:border-transparent"
+                className={inputClass}
               >
                 <option value={MaritalStatus.SINGLE}>Single</option>
                 <option value={MaritalStatus.MARRIED}>Married</option>
@@ -145,7 +143,7 @@ const CreateProfile: React.FC = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className={labelClass}>
                 Number of Dependents
               </label>
               <input
@@ -153,18 +151,18 @@ const CreateProfile: React.FC = () => {
                 min="0"
                 value={formData.dependents}
                 onChange={(e) => handleInputChange('dependents', parseInt(e.target.value) || 0)}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 bg-white text-gray-900 focus:ring-2 focus:ring-sky-500 focus:border-transparent"
+                className={inputClass}
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className={labelClass}>
                 Education
               </label>
               <select
                 value={formData.education}
                 onChange={(e) => handleInputChange('education', e.target.value as Education)}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 bg-white text-gray-900 focus:ring-2 focus:ring-sky-500 focus:border-transparent"
+                className={inputClass}
               >
                 <option value={Education.GRADUATE}>Graduate</option>
                 <option value={Education.NOT_GRADUATE}>Not Graduate</option>
@@ -173,17 +171,17 @@ const CreateProfile: React.FC = () => {
 
             {/* Financial Information */}
             <div className="md:col-span-2">
-              <h2 className="text-lg font-semibold text-gray-900 mb-4 mt-6">Financial Information</h2>
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 mt-6 transition-colors duration-300">Financial Information</h2>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className={labelClass}>
                 Employment Status
               </label>
               <select
                 value={formData.employmentStatus}
                 onChange={(e) => handleInputChange('employmentStatus', e.target.value as EmploymentStatus)}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 bg-white text-gray-900 focus:ring-2 focus:ring-sky-500 focus:border-transparent"
+                className={inputClass}
               >
                 <option value={EmploymentStatus.EMPLOYED}>Employed</option>
                 <option value={EmploymentStatus.SELF_EMPLOYED}>Self Employed</option>
@@ -192,7 +190,7 @@ const CreateProfile: React.FC = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className={labelClass}>
                 Monthly Income (XAF)
               </label>
               <input
@@ -200,12 +198,12 @@ const CreateProfile: React.FC = () => {
                 min="0"
                 value={formData.income}
                 onChange={(e) => handleInputChange('income', parseFloat(e.target.value) || 0)}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 bg-white text-gray-900 focus:ring-2 focus:ring-sky-500 focus:border-transparent"
+                className={inputClass}
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className={labelClass}>
                 Co-Applicant Income (XAF)
               </label>
               <input
@@ -213,18 +211,18 @@ const CreateProfile: React.FC = () => {
                 min="0"
                 value={formData.coApplicantIncome}
                 onChange={(e) => handleInputChange('coApplicantIncome', parseFloat(e.target.value) || 0)}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 bg-white text-gray-900 focus:ring-2 focus:ring-sky-500 focus:border-transparent"
+                className={inputClass}
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className={labelClass}>
                 Property Area
               </label>
               <select
                 value={formData.propertyArea}
                 onChange={(e) => handleInputChange('propertyArea', e.target.value as PropertyArea)}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 bg-white text-gray-900 focus:ring-2 focus:ring-sky-500 focus:border-transparent"
+                className={inputClass}
               >
                 <option value={PropertyArea.URBAN}>Urban</option>
                 <option value={PropertyArea.SEMIURBAN}>Semi-urban</option>
@@ -234,17 +232,17 @@ const CreateProfile: React.FC = () => {
 
             {/* Credit History Assessment */}
             <div className="md:col-span-2">
-              <h2 className="text-lg font-semibold text-gray-900 mb-4 mt-6">Credit History Assessment</h2>
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 mt-6 transition-colors duration-300">Credit History Assessment</h2>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className={labelClass}>
                 Bank Transactions
               </label>
               <select
                 value={formData.bankTransactions}
                 onChange={(e) => handleInputChange('bankTransactions', e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 bg-white text-gray-900 focus:ring-2 focus:ring-sky-500 focus:border-transparent"
+                className={inputClass}
               >
                 <option value="NONE">None</option>
                 <option value="LESS_THAN_5">Less than 5</option>
@@ -253,13 +251,13 @@ const CreateProfile: React.FC = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className={labelClass}>
                 Lending History
               </label>
               <select
                 value={formData.lendingHistory}
                 onChange={(e) => handleInputChange('lendingHistory', e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 bg-white text-gray-900 focus:ring-2 focus:ring-sky-500 focus:border-transparent"
+                className={inputClass}
               >
                 <option value="NONE">None</option>
                 <option value="LESS_THAN_5">Less than 5</option>
@@ -268,13 +266,13 @@ const CreateProfile: React.FC = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className={labelClass}>
                 Loan Purpose
               </label>
               <select
                 value={formData.loanPurpose}
                 onChange={(e) => handleInputChange('loanPurpose', e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 bg-white text-gray-900 focus:ring-2 focus:ring-sky-500 focus:border-transparent"
+                className={inputClass}
               >
                 <option value="BUSINESS_INVESTMENT">Business Investment</option>
                 <option value="RENTS_AND_BILLS">Rents and Bills</option>
@@ -292,13 +290,13 @@ const CreateProfile: React.FC = () => {
                   type="checkbox"
                   checked={formData.creditHistory}
                   onChange={(e) => handleInputChange('creditHistory', e.target.checked)}
-                  className="rounded border-gray-300 text-sky-600 focus:ring-sky-500"
+                  className="rounded border-gray-300 dark:border-gray-600 text-sky-600 focus:ring-sky-500 dark:bg-gray-700 transition-colors duration-300"
                 />
-                <span className="text-sm font-medium text-gray-700">
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-300 transition-colors duration-300">
                   Good Credit History (Automatically Calculated)
                 </span>
               </label>
-              <p className="text-xs text-gray-500 mt-1 ml-6">
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 ml-6 transition-colors duration-300">
                 This value is calculated automatically based on your banking behavior and loan patterns
               </p>
             </div>
@@ -309,21 +307,21 @@ const CreateProfile: React.FC = () => {
             <button
               type="submit"
               disabled={isLoading}
-              className="bg-gradient-to-r from-sky-500 to-teal-500 text-white px-6 py-2 rounded-lg font-medium hover:from-sky-600 hover:to-teal-600 disabled:opacity-50 transition-all duration-200"
+              className="btn-primary disabled:opacity-50"
             >
               {isLoading ? 'Creating...' : 'Create Profile'}
             </button>
             <button
               type="button"
               onClick={() => navigate('/profile')}
-              className="border border-gray-300 text-gray-700 px-6 py-2 rounded-lg font-medium hover:bg-gray-50 transition-colors duration-200"
+              className="btn-secondary"
             >
               Cancel
             </button>
           </div>
         </form>
-      </div>
-    </div>
+      </Card>
+    </AppLayout>
   );
 };
 
