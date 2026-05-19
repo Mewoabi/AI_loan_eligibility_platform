@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useData } from '../../context/DataContext';
+import { getApiErrorMessage } from '../../services/api';
 import { useToast } from '../../context/toastContext';
 
 
@@ -99,7 +100,7 @@ const MyScores: React.FC = () => {
         agreedDueDate: ''
       });
     } catch (error: any) {
-      showToast(error.response?.data?.detail || 'Failed to record loan', 'error');
+      showToast(getApiErrorMessage(error, 'Failed to record loan'), 'error');
       console.error('Failed to record loan:', error);
     } finally {
       setLoanModalLoading(false);
@@ -121,7 +122,7 @@ const MyScores: React.FC = () => {
         notes: ''
       });
     } catch (error: any) {
-      showToast(error.response?.data?.detail || 'Failed to update repayment status', 'error');
+      showToast(getApiErrorMessage(error, 'Failed to update repayment status'), 'error');
       console.error('Failed to update repayment status:', error);
     } finally {
       setRepaymentModalLoading(false);
@@ -165,7 +166,7 @@ const MyScores: React.FC = () => {
   return (
     <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
       <div className="px-4 py-6 sm:px-0">
-        <div className="bg-white dark:bg-gray-800 shadow overflow-hidden sm:rounded-lg transition-colors duration-300">
+        <div className="surface-card shadow overflow-hidden sm:rounded-lg transition-colors duration-300">
           <div className="px-4 py-5 sm:px-6 bg-gradient-to-r from-sky-500 to-teal-500">
             <div className="flex justify-between items-center">
               <h3 className="text-lg leading-6 font-medium text-white">My Credit Scores</h3>
@@ -245,7 +246,7 @@ const MyScores: React.FC = () => {
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-600 transition-colors duration-300">
+              <tbody className="surface-card divide-y divide-gray-200 dark:divide-gray-600 transition-colors duration-300">
                 {(activeTab === 'performed' ? myScores : scoresOnMe).map((score) => (
                   <tr key={score.id} className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-300">
                     <td className="px-6 py-4 whitespace-nowrap">
@@ -372,7 +373,7 @@ const MyScores: React.FC = () => {
       {showLoanModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           <div className="fixed inset-0 bg-black/40" />
-          <div className="relative z-10 p-5 border w-96 shadow-lg rounded-md bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-600">
+          <div className="relative z-10 p-5 border w-96 shadow-lg rounded-md surface-card border-gray-200 dark:border-gray-600">
             <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4 transition-colors duration-300">Record Loan Taken</h3>
             <div className="space-y-4">
               <div>
@@ -417,7 +418,7 @@ const MyScores: React.FC = () => {
                       type="number"
                       value={loanData.actualAmount}
                       onChange={(e) => setLoanData(prev => ({ ...prev, actualAmount: parseFloat(e.target.value) || 0 }))}
-                      className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-sky-500 focus:border-transparent transition-colors duration-300"
+                      className="input-field"
                     />
                   </div>
                   <div>
@@ -426,7 +427,7 @@ const MyScores: React.FC = () => {
                       type="date"
                       value={loanData.startDate}
                       onChange={(e) => setLoanData(prev => ({ ...prev, startDate: e.target.value }))}
-                      className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-sky-500 focus:border-transparent transition-colors duration-300"
+                      className="input-field"
                     />
                   </div>
                   <div>
@@ -435,7 +436,7 @@ const MyScores: React.FC = () => {
                       type="date"
                       value={loanData.agreedDueDate}
                       onChange={(e) => setLoanData(prev => ({ ...prev, agreedDueDate: e.target.value }))}
-                      className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-sky-500 focus:border-transparent transition-colors duration-300"
+                      className="input-field"
                     />
                   </div>
                 </>
@@ -469,7 +470,7 @@ const MyScores: React.FC = () => {
       {showRepaymentModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           <div className="fixed inset-0 bg-black/40" />
-          <div className="relative z-10 p-5 border w-96 shadow-lg rounded-md bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-600">
+          <div className="relative z-10 p-5 border w-96 shadow-lg rounded-md surface-card border-gray-200 dark:border-gray-600">
             <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4 transition-colors duration-300">Update Repayment Status</h3>
             <div className="space-y-4">
               <div>
@@ -477,7 +478,7 @@ const MyScores: React.FC = () => {
                 <select
                   value={repaymentData.status}
                   onChange={(e) => setRepaymentData(prev => ({ ...prev, status: e.target.value }))}
-                  className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-sky-500 focus:border-transparent transition-colors duration-300"
+                  className="input-field"
                 >
                   <option value="">Select Status</option>
                   <option value="IN_PROGRESS">In Progress</option>
@@ -494,7 +495,7 @@ const MyScores: React.FC = () => {
                     type="date"
                     value={repaymentData.completedDate}
                     onChange={(e) => setRepaymentData(prev => ({ ...prev, completedDate: e.target.value }))}
-                    className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-sky-500 focus:border-transparent transition-colors duration-300"
+                    className="input-field"
                   />
                 </div>
               )}
@@ -505,7 +506,7 @@ const MyScores: React.FC = () => {
                   value={repaymentData.notes}
                   onChange={(e) => setRepaymentData(prev => ({ ...prev, notes: e.target.value }))}
                   rows={3}
-                  className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-sky-500 focus:border-transparent transition-colors duration-300"
+                  className="input-field"
                   placeholder="Optional notes..."
                 />
               </div>

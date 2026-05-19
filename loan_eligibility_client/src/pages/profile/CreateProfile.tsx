@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useData } from '../../context/DataContext';
+import { getApiErrorMessage } from '../../services/api';
 import { useToast } from '../../context/toastContext';
 import { Gender, MaritalStatus, Education, EmploymentStatus, PropertyArea } from '../../types/enums';
+import { AppLayout } from '../../layouts/AppLayout';
+import { Card } from '../../components/ui';
 
 interface ProfileFormData {
   fullName: string;
@@ -59,33 +62,23 @@ const CreateProfile: React.FC = () => {
       await createProfile(formData);
       showToast('Profile created successfully!', 'success');
       navigate('/profile');
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Failed to create profile:', error);
-      if (Array.isArray(error.response?.data?.detail)) {
-        showToast(`${error.response.data.detail[0].loc[1]} ${error.response.data.detail[0].msg}`, 'error');
-      } else {
-        showToast(error.response?.data?.detail || 'Failed to create profile', 'error');
-      }
+      showToast(getApiErrorMessage(error, 'Failed to create profile'), 'error');
     }
   };
 
-  const inputClass =
-    'w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-sky-500 focus:border-transparent transition-colors duration-300';
+  const inputClass = 'input-field';
   const labelClass =
-    'block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 transition-colors duration-300';
+    'block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5';
 
   return (
-    <div className="max-w-4xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-      <div className="bg-white dark:bg-gray-800 shadow rounded-lg transition-colors duration-300">
-        {/* Header */}
-        <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700 transition-colors duration-300">
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white transition-colors duration-300">Create Profile</h1>
-          <p className="text-gray-600 dark:text-gray-300 mt-1 transition-colors duration-300">
-            Complete your profile to get started with credit scoring
-          </p>
-        </div>
-
-        {/* Profile Form */}
+    <AppLayout
+      maxWidth="lg"
+      title="Create Profile"
+      description="Complete your profile to get started with credit scoring"
+    >
+      <Card>
         <form onSubmit={handleSubmit} className="p-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Personal Information */}
@@ -314,21 +307,21 @@ const CreateProfile: React.FC = () => {
             <button
               type="submit"
               disabled={isLoading}
-              className="bg-gradient-to-r from-sky-500 to-teal-500 text-white px-6 py-2 rounded-lg font-medium hover:from-sky-600 hover:to-teal-600 disabled:opacity-50 transition-all duration-200"
+              className="btn-primary disabled:opacity-50"
             >
               {isLoading ? 'Creating...' : 'Create Profile'}
             </button>
             <button
               type="button"
               onClick={() => navigate('/profile')}
-              className="border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 px-6 py-2 rounded-lg font-medium hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200"
+              className="btn-secondary"
             >
               Cancel
             </button>
           </div>
         </form>
-      </div>
-    </div>
+      </Card>
+    </AppLayout>
   );
 };
 

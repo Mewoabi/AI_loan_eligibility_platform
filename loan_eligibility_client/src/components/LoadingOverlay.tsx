@@ -1,31 +1,39 @@
 import React from 'react';
+import { Spinner } from './ui';
 
 interface LoadingOverlayProps {
   isLoading: boolean;
   message?: string;
 }
 
-const LoadingOverlay: React.FC<LoadingOverlayProps> = ({ isLoading, message = "Loading your data..." }) => {
+const LoadingOverlay: React.FC<LoadingOverlayProps> = ({
+  isLoading,
+  message = 'Loading your data...',
+}) => {
   if (!isLoading) return null;
 
   return (
-    <div className="fixed inset-0 bg-white dark:bg-gray-900 bg-opacity-95 dark:bg-opacity-95 z-50 flex items-center justify-center">
-      <div className="text-center">
-        <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-sky-500 mx-auto mb-4"></div>
-        <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/80 dark:bg-gray-950/80 backdrop-blur-md">
+      <div className="text-center surface-card px-10 py-8 max-w-sm mx-4">
+        <Spinner size="lg" />
+        <h2 className="mt-6 text-xl font-bold text-gray-900 dark:text-white">
           Welcome to ScoreSure
         </h2>
-        <p className="text-gray-600 dark:text-gray-300">
-          {message}
-        </p>
-        <div className="mt-4 flex justify-center space-x-2">
-          <div className="w-2 h-2 bg-sky-500 rounded-full animate-bounce"></div>
-          <div className="w-2 h-2 bg-sky-500 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-          <div className="w-2 h-2 bg-sky-500 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+        <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">{message}</p>
+        <div className="mt-5 flex justify-center gap-1.5">
+          <span className="w-2 h-2 rounded-full bg-sky-500 animate-bounce" />
+          <span
+            className="w-2 h-2 rounded-full bg-teal-500 animate-bounce"
+            style={{ animationDelay: '0.1s' }}
+          />
+          <span
+            className="w-2 h-2 rounded-full bg-sky-400 animate-bounce"
+            style={{ animationDelay: '0.2s' }}
+          />
         </div>
       </div>
     </div>
   );
 };
 
-export default LoadingOverlay; 
+export default LoadingOverlay;

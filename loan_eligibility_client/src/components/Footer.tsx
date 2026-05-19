@@ -51,8 +51,8 @@ const Footer: React.FC = () => {
                     </Link>
                   </li>
                   <li>
-                    <Link to="/apply" className="text-base text-gray-400 dark:text-gray-300 hover:text-white transition-colors duration-200">
-                      Apply for Loan
+                    <Link to="/score-user" className="text-base text-gray-400 dark:text-gray-300 hover:text-white transition-colors duration-200">
+                      Perform Scoring
                     </Link>
                   </li>
                   <li>
@@ -61,8 +61,8 @@ const Footer: React.FC = () => {
                     </Link>
                   </li>
                   <li>
-                    <Link to="/my-applications" className="text-base text-gray-400 dark:text-gray-300 hover:text-white transition-colors duration-200">
-                      My Applications
+                    <Link to="/my-scores" className="text-base text-gray-400 dark:text-gray-300 hover:text-white transition-colors duration-200">
+                      My Scores
                     </Link>
                   </li>
                 </ul>

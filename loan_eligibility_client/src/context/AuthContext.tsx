@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { loginUser, registerUser, getCurrentUser } from '../services/api';
+import { loginUser, registerUser, getCurrentUser, getApiErrorMessage } from '../services/api';
 import { useToast } from './toastContext';
 
 interface User {
@@ -61,8 +61,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // Get user data
       const userResponse = await getCurrentUser();
       setUser(userResponse.data);
-    } catch (err: any) {
-      const errorMessage = err.response?.data?.detail || 'Login failed';
+    } catch (err: unknown) {
+      const errorMessage = getApiErrorMessage(err, 'Login failed');
       setError(errorMessage);
       showToast(errorMessage, 'error');
       console.error('Login failed:', err);
@@ -76,8 +76,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       await registerUser(email, password);
       // Automatically login after registration
       await login(email, password);
-    } catch (err: any) {
-      const errorMessage = err.response?.data?.detail || 'Registration failed';
+    } catch (err: unknown) {
+      const errorMessage = getApiErrorMessage(err, 'Registration failed');
       setError(errorMessage);
       showToast(errorMessage, 'error');
       console.error('Registration failed:', err);

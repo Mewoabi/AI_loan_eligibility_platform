@@ -193,8 +193,8 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     try {
       const response = await api.getProfile();
       setProfile(response.data);
-    } catch (err: any) {
-      const errorMessage = err.response?.data?.detail || 'Failed to fetch profile';
+    } catch (err: unknown) {
+      const errorMessage = api.getApiErrorMessage(err, 'Failed to fetch profile');
       setError(prev => ({ ...prev, profile: errorMessage }));
       console.error('Failed to fetch profile:', err);
     } finally {
@@ -211,8 +211,8 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     try {
       const response = await api.getDashboardStats();
       setDashboardStats(response.data);
-    } catch (err: any) {
-      const errorMessage = err.response?.data?.detail || 'Failed to fetch dashboard stats';
+    } catch (err: unknown) {
+      const errorMessage = api.getApiErrorMessage(err, 'Failed to fetch dashboard stats');
       setError(prev => ({ ...prev, dashboardStats: errorMessage }));
       console.error('Failed to fetch dashboard stats:', err);
     } finally {
@@ -229,8 +229,8 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     try {
       const response = await api.getMyScores();
       setMyScores(response.data);
-    } catch (err: any) {
-      const errorMessage = err.response?.data?.detail || 'Failed to fetch my scores';
+    } catch (err: unknown) {
+      const errorMessage = api.getApiErrorMessage(err, 'Failed to fetch my scores');
       setError(prev => ({ ...prev, myScores: errorMessage }));
       console.error('Failed to fetch my scores:', err);
     } finally {
@@ -247,8 +247,8 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     try {
       const response = await api.getScoresOnMe();
       setScoresOnMe(response.data);
-    } catch (err: any) {
-      const errorMessage = err.response?.data?.detail || 'Failed to fetch scores on me';
+    } catch (err: unknown) {
+      const errorMessage = api.getApiErrorMessage(err, 'Failed to fetch scores on me');
       setError(prev => ({ ...prev, scoresOnMe: errorMessage }));
       console.error('Failed to fetch scores on me:', err);
     } finally {
@@ -267,8 +267,8 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       // Filter out the current user
       const filteredUsers = response.data.filter((user: User) => user.id !== currentUser.id);
       setUsers(filteredUsers);
-    } catch (err: any) {
-      const errorMessage = err.response?.data?.detail || 'Failed to fetch users';
+    } catch (err: unknown) {
+      const errorMessage = api.getApiErrorMessage(err, 'Failed to fetch users');
       setError(prev => ({ ...prev, users: errorMessage }));
       console.error('Failed to fetch users:', err);
     } finally {
@@ -287,10 +287,10 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       await api.updateProfile(profileData);
       await fetchProfile(); // Refresh to get server state
       showToast('Profile updated successfully!', 'success');
-    } catch (err: any) {
+    } catch (err: unknown) {
       // Revert optimistic update on error
       await fetchProfile();
-      const errorMessage = err.response?.data?.detail || 'Failed to update profile';
+      const errorMessage = api.getApiErrorMessage(err, 'Failed to update profile');
       showToast(errorMessage, 'error');
       throw err;
     }
@@ -303,8 +303,8 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       await api.createProfile(profileData);
       await fetchProfile(); // Refresh profile data
       showToast('Profile created successfully!', 'success');
-    } catch (err: any) {
-      const errorMessage = err.response?.data?.detail || 'Failed to create profile';
+    } catch (err: unknown) {
+      const errorMessage = api.getApiErrorMessage(err, 'Failed to create profile');
       showToast(errorMessage, 'error');
       throw err;
     } finally {
@@ -320,8 +320,8 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       // Also refresh dashboard stats since they might be affected
       await fetchDashboardStats();
       showToast('Score saved successfully!', 'success');
-    } catch (err: any) {
-      const errorMessage = err.response?.data?.detail || 'Failed to save score';
+    } catch (err: unknown) {
+      const errorMessage = api.getApiErrorMessage(err, 'Failed to save score');
       showToast(errorMessage, 'error');
       throw err;
     }
@@ -343,10 +343,10 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       // Also refresh dashboard stats since they might be affected
       await fetchDashboardStats();
       showToast('Score status updated successfully!', 'success');
-    } catch (err: any) {
+    } catch (err: unknown) {
       // Revert optimistic updates on error
       await Promise.all([fetchMyScores(), fetchScoresOnMe()]);
-      const errorMessage = err.response?.data?.detail || 'Failed to update score status';
+      const errorMessage = api.getApiErrorMessage(err, 'Failed to update score status');
       showToast(errorMessage, 'error');
       throw err;
     }
@@ -364,10 +364,10 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       // Also refresh dashboard stats
       await fetchDashboardStats();
       showToast('Score deleted successfully!', 'success');
-    } catch (err: any) {
+    } catch (err: unknown) {
       // Revert optimistic update on error
       await Promise.all([fetchMyScores(), fetchScoresOnMe()]);
-      const errorMessage = err.response?.data?.detail || 'Failed to delete score';
+      const errorMessage = api.getApiErrorMessage(err, 'Failed to delete score');
       showToast(errorMessage, 'error');
       throw err;
     }
@@ -388,8 +388,8 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         fetchScoresOnMe(),
         fetchUsers(),
       ]);
-    } catch (err) {
-      const errorMessage = 'Failed to load initial data';
+    } catch (err: unknown) {
+      const errorMessage = api.getApiErrorMessage(err, 'Failed to load initial data');
       setError(prev => ({ ...prev, initial: errorMessage }));
       console.error('Failed to refresh all data:', err);
     } finally {

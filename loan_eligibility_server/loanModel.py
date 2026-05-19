@@ -189,6 +189,17 @@ class DashboardStats(BaseModel):
     recentScores: List[RecentScore]
 
 
+class HealthResponse(BaseModel):
+    status: str  # healthy | degraded | unhealthy
+    modelLoaded: bool
+    database: str  # connected | disconnected
+    databaseAttempts: int
+    detail: Optional[str] = None
+
+    class Config:
+        populate_by_name = True
+
+
 # UNUSED ENUMS SINCE THEY ARE ALREADY DEFINED IN prisma.enums
 # class Gender(str, Enum):
 #     MALE = "MALE"

@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { getScoreById } from '../../services/api';
+import { getScoreById, getApiErrorMessage } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 import { useData } from '../../context/DataContext';
 import { useToast } from '../../context/toastContext';
 import type { Gender, MaritalStatus, Education, EmploymentStatus, PropertyArea, DecisionStatus, LoanOutcome } from '../../types/enums';
+import { AppLayout } from '../../layouts/AppLayout';
+import { Badge, Button, Callout, Spinner } from '../../components/ui';
 
 // interface ScoreDetail {
 //   id: string;
@@ -118,7 +120,7 @@ const ScoreDetails: React.FC = () => {
           if(data) setScorer(data)
         }
       } catch (err: any) {
-        const errorMessage = err.response?.data?.detail || 'Failed to load score details';
+        const errorMessage = getApiErrorMessage(err, 'Failed to load score details');
         setError(errorMessage);
         showToast(errorMessage, 'error');
         console.error('Failed to load score details:', err);
@@ -141,19 +143,18 @@ const ScoreDetails: React.FC = () => {
   };
 
   const getRepaymentBadge = (status: string | null) => {
-    if (!status) return <span className="px-3 py-1 text-sm rounded-full bg-gray-100 text-gray-800">Pending</span>;
-    
+    if (!status) return <Badge variant="default">Pending</Badge>;
     switch (status) {
       case 'PAID':
-        return <span className="px-3 py-1 text-sm rounded-full bg-green-100 text-green-800">Paid</span>;
+        return <Badge variant="success">Paid</Badge>;
       case 'DEFAULTED':
-        return <span className="px-3 py-1 text-sm rounded-full bg-red-100 text-red-800">Defaulted</span>;
+        return <Badge variant="error">Defaulted</Badge>;
       case 'IN_PROGRESS':
-        return <span className="px-3 py-1 text-sm rounded-full bg-blue-100 text-blue-800">In Progress</span>;
+        return <Badge variant="info">In Progress</Badge>;
       case 'OVERDUE':
-        return <span className="px-3 py-1 text-sm rounded-full bg-orange-100 text-orange-800">Overdue</span>;
+        return <Badge variant="warning">Overdue</Badge>;
       default:
-        return <span className="px-3 py-1 text-sm rounded-full bg-gray-100 text-gray-800">Unknown</span>;
+        return <Badge variant="default">Unknown</Badge>;
     }
   };
   const handleRecordLoanTaken = async () => {
@@ -180,7 +181,7 @@ const ScoreDetails: React.FC = () => {
       const response = await getScoreById(score.id);
       setScore(response.data);
     } catch (error: any) {
-      showToast(error.response?.data?.detail || 'Failed to record loan', 'error');
+      showToast(getApiErrorMessage(error, 'Failed to record loan'), 'error');
       console.error('Failed to record loan:', error);
     } finally {
       setLoanModalLoading(false);
@@ -206,7 +207,7 @@ const ScoreDetails: React.FC = () => {
       const response = await getScoreById(score.id);
       setScore(response.data);
     } catch (error: any) {
-      showToast(error.response?.data?.detail || 'Failed to update repayment status', 'error');
+      showToast(getApiErrorMessage(error, 'Failed to update repayment status'), 'error');
       console.error('Failed to update repayment status:', error);
     } finally {
       setRepaymentModalLoading(false);
@@ -241,158 +242,143 @@ const ScoreDetails: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-sky-500"></div>
-      </div>
+      <AppLayout maxWidth="7xl">
+        <div className="flex justify-center py-24">
+          <Spinner size="lg" label="Loading score details..." />
+        </div>
+      </AppLayout>
     );
   }
 
   if (error || !score) {
     // Error is now shown via toast, just show a fallback UI
     return (
-      <div className="max-w-4xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-        <div className="bg-red-50 border border-red-200 rounded-lg p-6">
-          <h3 className="text-lg font-medium text-red-800 mb-2">Error</h3>
-          <p className="text-red-700">An error occurred. Please try again later.</p>
-          <button
-            onClick={() => navigate('/my-scores')}
-            className="mt-4 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700"
-          >
+      <AppLayout maxWidth="lg">
+        <Callout variant="warning" title="Error">
+          <p className="mb-4">An error occurred. Please try again later.</p>
+          <Button variant="secondary" onClick={() => navigate('/my-scores')}>
             Back to Scores
-          </button>
-        </div>
-      </div>
+          </Button>
+        </Callout>
+      </AppLayout>
     );
   }
 
   return (
-    <div className="max-w-6xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-      {/* Header */}
-      <div className="bg-white shadow rounded-lg p-6 mb-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">Credit Score Details</h1>
-            <p className="text-gray-600 mt-1">
-              Score ID: {score.id.slice(0, 8)}...
-            </p>
-          </div>
-          <button
-            onClick={() => navigate(-1)}
-            className="text-gray-600 hover:text-gray-900 font-medium"
-          >
-            ← Back
-          </button>
-        </div>
-      </div>
-
+    <AppLayout
+      maxWidth="7xl"
+      title="Credit Score Details"
+      description={`Score ID: ${score.id.slice(0, 8)}...`}
+      actions={<Button variant="ghost" onClick={() => navigate(-1)}>← Back</Button>}
+    >
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Score Summary */}
         <div className="lg:col-span-2">
-          <div className="bg-white shadow rounded-lg p-6 mb-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">Score Summary</h2>
+          <div className="surface-card p-6 mb-6">
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Score Summary</h2>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="text-center p-6 bg-gradient-to-br from-sky-50 to-teal-50 rounded-lg">
+              <div className="text-center p-6 bg-gradient-to-br from-sky-500/10 to-teal-500/10 dark:from-sky-500/20 dark:to-teal-500/20 border border-sky-200/50 dark:border-sky-700/50 rounded-lg">
                 <div className="text-4xl font-bold text-sky-600 mb-2">
                   {(score.score * 100).toFixed(1)}%
                 </div>
-                <div className="text-sm text-gray-600">Credit Score</div>
+                <div className="text-sm text-gray-600 dark:text-gray-400">Credit Score</div>
               </div>
               
-              <div className="text-center p-6 bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg">
+              <div className="text-center p-6 bg-gradient-to-br from-emerald-500/10 to-emerald-500/5 dark:from-emerald-500/20 dark:to-emerald-500/10 border border-emerald-200/50 dark:border-emerald-800/50 rounded-lg">
                 <div className={`text-2xl font-bold mb-2 ${score.eligible ? 'text-green-600' : 'text-red-600'}`}>
                   {score.eligible ? 'ELIGIBLE' : 'NOT ELIGIBLE'}
                 </div>
-                <div className="text-sm text-gray-600">AI Recommendation</div>
+                <div className="text-sm text-gray-600 dark:text-gray-400">AI Recommendation</div>
               </div>
             </div>
 
             <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700">Scorer</label>
-                <p className="text-gray-900">{scorer && scorer.fullName || ""}</p>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Scorer</label>
+                <p className="text-gray-900 dark:text-white">{scorer && scorer.fullName || ""}</p>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">Scored User</label>
-                <p className="text-gray-900">{scoredUser && scoredUser.fullName || ""}</p>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Scored User</label>
+                <p className="text-gray-900 dark:text-white">{scoredUser && scoredUser.fullName || ""}</p>
                 {scoredUser && (
                   <p className="text-sm text-gray-500">{scoredUser.email}</p>
                 )}
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">Score Date</label>
-                <p className="text-gray-900">{formatDate(score.createdAt)}</p>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Score Date</label>
+                <p className="text-gray-900 dark:text-white">{formatDate(score.createdAt)}</p>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">Last Updated</label>
-                <p className="text-gray-900">{formatDate(score.updatedAt)}</p>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Last Updated</label>
+                <p className="text-gray-900 dark:text-white">{formatDate(score.updatedAt)}</p>
               </div>
             </div>
 
             {score.notes && (
               <div className="mt-4">
-                <label className="block text-sm font-medium text-gray-700 mb-2">Notes</label>
-                <p className="text-gray-900 bg-gray-50 p-3 rounded-lg">{score.notes}</p>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Notes</label>
+                <p className="text-gray-900 dark:text-white bg-gray-50 dark:bg-gray-800/50 p-3 rounded-lg">{score.notes}</p>
               </div>
             )}
           </div>
 
           {/* Score Data Details */}
-          <div className="bg-white shadow rounded-lg p-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">Scoring Data</h2>
+          <div className="surface-card p-6">
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Scoring Data</h2>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <h3 className="text-lg font-medium text-gray-900 mb-3">Personal Information</h3>
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-3">Personal Information</h3>
                 <div className="space-y-3">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">Gender</label>
-                    <p className="text-gray-900">{score.gender}</p>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Gender</label>
+                    <p className="text-gray-900 dark:text-white">{score.gender}</p>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">Marital Status</label>
-                    <p className="text-gray-900">{score.maritalStatus}</p>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Marital Status</label>
+                    <p className="text-gray-900 dark:text-white">{score.maritalStatus}</p>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">Dependents</label>
-                    <p className="text-gray-900">{score.dependents}</p>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Dependents</label>
+                    <p className="text-gray-900 dark:text-white">{score.dependents}</p>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">Education</label>
-                    <p className="text-gray-900">{score.education}</p>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Education</label>
+                    <p className="text-gray-900 dark:text-white">{score.education}</p>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">Property Area</label>
-                    <p className="text-gray-900">{score.propertyArea}</p>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Property Area</label>
+                    <p className="text-gray-900 dark:text-white">{score.propertyArea}</p>
                   </div>
                 </div>
               </div>
 
               <div>
-                <h3 className="text-lg font-medium text-gray-900 mb-3">Financial Information</h3>
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-3">Financial Information</h3>
                 <div className="space-y-3">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">Employment Status</label>
-                    <p className="text-gray-900">{score.employmentStatus}</p>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Employment Status</label>
+                    <p className="text-gray-900 dark:text-white">{score.employmentStatus}</p>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">Monthly Income</label>
-                    <p className="text-gray-900">XAF {score.income.toLocaleString()}</p>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Monthly Income</label>
+                    <p className="text-gray-900 dark:text-white">XAF {score.income.toLocaleString()}</p>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">Co-Applicant Income</label>
-                    <p className="text-gray-900">XAF {score.coApplicantIncome.toLocaleString()}</p>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Co-Applicant Income</label>
+                    <p className="text-gray-900 dark:text-white">XAF {score.coApplicantIncome.toLocaleString()}</p>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">Requested Loan Amount</label>
-                    <p className="text-gray-900">XAF {(score.amount*1000).toLocaleString()}</p>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Requested Loan Amount</label>
+                    <p className="text-gray-900 dark:text-white">XAF {(score.amount*1000).toLocaleString()}</p>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">Loan Term</label>
-                    <p className="text-gray-900">{score.term} months</p>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Loan Term</label>
+                    <p className="text-gray-900 dark:text-white">{score.term} months</p>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">Credit History</label>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Credit History</label>
                     <p className={`font-medium ${score.creditHistory ? 'text-green-600' : 'text-red-600'}`}>
                       {score.creditHistory ? 'Good' : 'Poor'}
                     </p>
@@ -406,11 +392,11 @@ const ScoreDetails: React.FC = () => {
         {/* Loan Status Sidebar */}
         <div className="space-y-6">
           {/* Loan Decision */}
-          <div className="bg-white shadow rounded-lg p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Loan Decision</h3>
+          <div className="surface-card p-6">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Loan Decision</h3>
             
             <div className="space-y-4">              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Status</label>
                 {score.decisionStatus === 'AWARDED' || score.decisionStatus === 'AWARDED_AND_TAKEN' ? (
                   <span className="px-3 py-1 text-sm rounded-full bg-green-100 text-green-800">
                     Loan Awarded
@@ -429,16 +415,16 @@ const ScoreDetails: React.FC = () => {
               {(score.decisionStatus === 'AWARDED' || score.decisionStatus === 'AWARDED_AND_TAKEN') && (
                 <>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Awarded Amount</label>
-                    <p className="text-lg font-semibold text-gray-900">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Awarded Amount</label>
+                    <p className="text-lg font-semibold text-gray-900 dark:text-white">
                       XAF {score.awardedAmount?.toLocaleString()}
                     </p>
                   </div>
                   
                   {score.dueDate && (
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Due Date</label>
-                      <p className="text-gray-900">
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Due Date</label>
+                      <p className="text-gray-900 dark:text-white">
                         {new Date(score.dueDate).toLocaleDateString()}
                       </p>
                     </div>
@@ -448,12 +434,12 @@ const ScoreDetails: React.FC = () => {
             </div>
           </div>          {/* Loan Tracking */}
           {(score.decisionStatus === 'AWARDED' || score.decisionStatus === 'AWARDED_AND_TAKEN') && (
-            <div className="bg-white shadow rounded-lg p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Loan Tracking</h3>
+            <div className="surface-card p-6">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Loan Tracking</h3>
               
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Loan Status</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Loan Status</label>
                   {score.decisionStatus === 'AWARDED' ? (
                     <span className="px-3 py-1 text-sm rounded-full bg-yellow-100 text-yellow-800">
                       Pending Response
@@ -471,7 +457,7 @@ const ScoreDetails: React.FC = () => {
                 
                 {score.decisionStatus === 'AWARDED_AND_TAKEN' && (
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Repayment Status</label>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Repayment Status</label>
                     {getRepaymentBadge(score.outcomeStatus)}
                   </div>
                 )}
@@ -491,7 +477,7 @@ const ScoreDetails: React.FC = () => {
                 {score.decisionStatus === 'AWARDED_AND_TAKEN' && (isScorer || isScoredUser) && (
                   <button
                     onClick={handleOpenRepaymentModal}
-                    className="w-full border border-gray-300 text-gray-700 px-4 py-2 rounded-lg font-medium hover:bg-gray-50"
+                    className="w-full border border-gray-300 text-gray-700 dark:text-gray-300 px-4 py-2 rounded-lg font-medium hover:bg-gray-50"
                   >
                     Update Repayment Status
                   </button>
@@ -507,10 +493,10 @@ const ScoreDetails: React.FC = () => {
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           <div className="fixed inset-0 bg-black/40" />
           <div className="relative z-10 p-5 border w-96 shadow-lg rounded-md bg-white">
-            <h3 className="text-lg font-medium text-gray-900 mb-4">Record Loan Status</h3>
+            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Record Loan Status</h3>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Did you take this loan?</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Did you take this loan?</label>
                 <div className="space-y-2">
                   <label className="flex items-center">
                     <input
@@ -546,30 +532,30 @@ const ScoreDetails: React.FC = () => {
               {loanTaken === 'yes' && (
                 <>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Actual Loan Amount ($)</label>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Actual Loan Amount ($)</label>
                     <input
                       type="number"
                       value={loanData.actualAmount}
                       onChange={(e) => setLoanData(prev => ({ ...prev, actualAmount: parseFloat(e.target.value) || 0 }))}
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-sky-500 focus:border-transparent"
+                      className="input-field"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Start Date</label>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Start Date</label>
                     <input
                       type="date"
                       value={loanData.startDate}
                       onChange={(e) => setLoanData(prev => ({ ...prev, startDate: e.target.value }))}
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-sky-500 focus:border-transparent"
+                      className="input-field"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Agreed Due Date</label>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Agreed Due Date</label>
                     <input
                       type="date"
                       value={loanData.agreedDueDate}
                       onChange={(e) => setLoanData(prev => ({ ...prev, agreedDueDate: e.target.value }))}
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-sky-500 focus:border-transparent"
+                      className="input-field"
                     />
                   </div>
                 </>
@@ -589,7 +575,7 @@ const ScoreDetails: React.FC = () => {
                   setLoanTaken(null);
                   setLoanData({ actualAmount: 0, startDate: '', agreedDueDate: '' });
                 }}
-                className="border border-gray-300 text-gray-700 px-4 py-2 rounded-lg font-medium hover:bg-gray-50"
+                className="border border-gray-300 text-gray-700 dark:text-gray-300 px-4 py-2 rounded-lg font-medium hover:bg-gray-50"
                 disabled={loanModalLoading}
               >
                 Cancel
@@ -604,14 +590,14 @@ const ScoreDetails: React.FC = () => {
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           <div className="fixed inset-0 bg-black/40" />
           <div className="relative z-10 p-5 border w-96 shadow-lg rounded-md bg-white">
-            <h3 className="text-lg font-medium text-gray-900 mb-4">Update Repayment Status</h3>
+            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Update Repayment Status</h3>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Repayment Status</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Repayment Status</label>
                 <select
                   value={repaymentData.status}
                   onChange={(e) => setRepaymentData(prev => ({ ...prev, status: e.target.value }))}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-sky-500 focus:border-transparent"
+                  className="input-field"
                 >
                   <option value="">Select Status</option>
                   <option value="IN_PROGRESS">In Progress</option>
@@ -623,23 +609,23 @@ const ScoreDetails: React.FC = () => {
               
               {(repaymentData.status === 'PAID' || repaymentData.status === 'DEFAULTED') && (
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Completion Date</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Completion Date</label>
                   <input
                     type="date"
                     value={repaymentData.completedDate}
                     onChange={(e) => setRepaymentData(prev => ({ ...prev, completedDate: e.target.value }))}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-sky-500 focus:border-transparent"
+                    className="input-field"
                   />
                 </div>
               )}
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Notes</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Notes</label>
                 <textarea
                   value={repaymentData.notes}
                   onChange={(e) => setRepaymentData(prev => ({ ...prev, notes: e.target.value }))}
                   rows={3}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-sky-500 focus:border-transparent"
+                  className="input-field"
                   placeholder="Optional notes..."
                 />
               </div>
@@ -657,7 +643,7 @@ const ScoreDetails: React.FC = () => {
                   setShowRepaymentModal(false);
                   setRepaymentData({ status: '', completedDate: '', notes: '' });
                 }}
-                className="border border-gray-300 text-gray-700 px-4 py-2 rounded-lg font-medium hover:bg-gray-50"
+                className="border border-gray-300 text-gray-700 dark:text-gray-300 px-4 py-2 rounded-lg font-medium hover:bg-gray-50"
                 disabled={repaymentModalLoading}
               >
                 Cancel
@@ -666,7 +652,7 @@ const ScoreDetails: React.FC = () => {
           </div>
         </div>
       )}
-    </div>
+    </AppLayout>
   );
 };
 

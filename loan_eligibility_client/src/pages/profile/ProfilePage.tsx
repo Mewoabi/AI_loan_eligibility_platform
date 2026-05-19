@@ -194,10 +194,10 @@ const ProfilePage: React.FC = () => {
                     id="full_name"
                     value={profileForm.fullName}
                     onChange={handleChange}
-                    className="w-full h-12 px-4 border border-gray-300 dark:border-gray-600 rounded-xl shadow-sm focus:ring-2 focus:ring-sky-500 focus:border-sky-500 bg-white/70 dark:bg-gray-700/70 backdrop-blur-sm text-gray-900 dark:text-white transition-all duration-200"
+                    className="w-full h-12 px-4 border border-gray-300 dark:border-gray-600 rounded-xl shadow-sm focus:ring-2 focus:ring-sky-500 focus:border-sky-500 input-field text-gray-900 dark:text-white transition-all duration-200"
                     placeholder="Enter your full name"
                   /> : 
-                  <p className="w-full py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-xl shadow-sm focus:ring-2 hover:ring-sky-500 hover:border-sky-500 bg-white/70 dark:bg-gray-700/70 backdrop-blur-sm text-gray-900 dark:text-white transition-all duration-200">{profile?.fullName}</p>
+                  <p className="w-full py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-xl shadow-sm focus:ring-2 hover:ring-sky-500 hover:border-sky-500 input-field text-gray-900 dark:text-white transition-all duration-200">{profile?.fullName}</p>
                   }
                 </div>
 
@@ -211,10 +211,10 @@ const ProfilePage: React.FC = () => {
                     id="national_id"
                     value={profile?.nationalId}
                     onChange={handleChange}
-                    className="w-full h-12 px-4 border border-gray-300 dark:border-gray-600 rounded-xl shadow-sm focus:ring-2 focus:ring-sky-500 focus:border-sky-500 bg-white/70 dark:bg-gray-700/70 backdrop-blur-sm text-gray-900 dark:text-white transition-all duration-200"
+                    className="w-full h-12 px-4 border border-gray-300 dark:border-gray-600 rounded-xl shadow-sm focus:ring-2 focus:ring-sky-500 focus:border-sky-500 input-field text-gray-900 dark:text-white transition-all duration-200"
                     placeholder="Enter your national ID"
                   />: 
-                   <p className="w-full py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-xl shadow-sm focus:ring-2 hover:ring-sky-500 hover:border-sky-500 bg-white/70 dark:bg-gray-700/70 backdrop-blur-sm text-gray-900 dark:text-white transition-all duration-200">{profile?.nationalId}</p>
+                   <p className="w-full py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-xl shadow-sm focus:ring-2 hover:ring-sky-500 hover:border-sky-500 input-field text-gray-900 dark:text-white transition-all duration-200">{profile?.nationalId}</p>
                   }
                 </div>
                 
@@ -227,13 +227,13 @@ const ProfilePage: React.FC = () => {
                     name="gender"
                     value={profile?.gender}
                     onChange={handleChange}
-                    className="w-full h-12 px-4 border border-gray-300 dark:border-gray-600 rounded-xl shadow-sm focus:ring-2 focus:ring-sky-500 focus:border-sky-500 bg-white/70 dark:bg-gray-700/70 backdrop-blur-sm text-gray-900 dark:text-white transition-all duration-200"
+                    className="w-full h-12 px-4 border border-gray-300 dark:border-gray-600 rounded-xl shadow-sm focus:ring-2 focus:ring-sky-500 focus:border-sky-500 input-field text-gray-900 dark:text-white transition-all duration-200"
                   >
                     <option value="MALE">Male</option>
                     <option value="FEMALE">Female</option>
                     <option value="OTHER">Other</option>
                   </select> : 
-                   <p className="w-full py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-xl shadow-sm focus:ring-2 hover:ring-sky-500 hover:border-sky-500 bg-white/70 dark:bg-gray-700/70 backdrop-blur-sm text-gray-900 dark:text-white transition-all duration-200">{profile?.gender}</p>
+                   <p className="w-full py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-xl shadow-sm focus:ring-2 hover:ring-sky-500 hover:border-sky-500 input-field text-gray-900 dark:text-white transition-all duration-200">{profile?.gender}</p>
                   }
                 </div>
 
@@ -246,14 +246,14 @@ const ProfilePage: React.FC = () => {
                     name="maritalStatus"
                     value={profile?.maritalStatus}
                     onChange={handleChange}
-                    className="w-full h-12 px-4 border border-gray-300 dark:border-gray-600 rounded-xl shadow-sm focus:ring-2 focus:ring-sky-500 focus:border-sky-500 bg-white/70 dark:bg-gray-700/70 backdrop-blur-sm text-gray-900 dark:text-white transition-all duration-200"
+                    className="w-full h-12 px-4 border border-gray-300 dark:border-gray-600 rounded-xl shadow-sm focus:ring-2 focus:ring-sky-500 focus:border-sky-500 input-field text-gray-900 dark:text-white transition-all duration-200"
                   >
                     <option value="SINGLE">Single</option>
                     <option value="MARRIED">Married</option>
                     <option value="DIVORCED">Divorced</option>
                     <option value="WIDOWED">Widowed</option>
                   </select>: 
-                   <p className="w-full py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-xl shadow-sm focus:ring-2 hover:ring-sky-500 hover:border-sky-500 bg-white/70 dark:bg-gray-700/70 backdrop-blur-sm text-gray-900 dark:text-white transition-all duration-200">{profile?.maritalStatus}</p>
+                   <p className="w-full py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-xl shadow-sm focus:ring-2 hover:ring-sky-500 hover:border-sky-500 input-field text-gray-900 dark:text-white transition-all duration-200">{profile?.maritalStatus}</p>
                   }
                 </div>
 
@@ -268,10 +268,10 @@ const ProfilePage: React.FC = () => {
                     min="0"
                     value={profile?.dependents}
                     onChange={handleChange}
-                    className="w-full h-12 px-4 border border-gray-300 dark:border-gray-600 rounded-xl shadow-sm focus:ring-2 focus:ring-sky-500 focus:border-sky-500 bg-white/70 dark:bg-gray-700/70 backdrop-blur-sm text-gray-900 dark:text-white transition-all duration-200"
+                    className="w-full h-12 px-4 border border-gray-300 dark:border-gray-600 rounded-xl shadow-sm focus:ring-2 focus:ring-sky-500 focus:border-sky-500 input-field text-gray-900 dark:text-white transition-all duration-200"
                     placeholder="0"
                   /> : 
-                   <p className="w-full py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-xl shadow-sm focus:ring-2 hover:ring-sky-500 hover:border-sky-500 bg-white/70 dark:bg-gray-700/70 backdrop-blur-sm text-gray-900 dark:text-white transition-all duration-200">{profile?.dependents}</p>
+                   <p className="w-full py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-xl shadow-sm focus:ring-2 hover:ring-sky-500 hover:border-sky-500 input-field text-gray-900 dark:text-white transition-all duration-200">{profile?.dependents}</p>
                   }
                 </div>
 
@@ -284,12 +284,12 @@ const ProfilePage: React.FC = () => {
                     name="education"
                     value={profile?.education}
                     onChange={handleChange}
-                    className="w-full h-12 px-4 border border-gray-300 dark:border-gray-600 rounded-xl shadow-sm focus:ring-2 focus:ring-sky-500 focus:border-sky-500 bg-white/70 dark:bg-gray-700/70 backdrop-blur-sm text-gray-900 dark:text-white transition-all duration-200"
+                    className="w-full h-12 px-4 border border-gray-300 dark:border-gray-600 rounded-xl shadow-sm focus:ring-2 focus:ring-sky-500 focus:border-sky-500 input-field text-gray-900 dark:text-white transition-all duration-200"
                   >
                     <option value="GRADUATE">Graduate</option>
                     <option value="NOT_GRADUATE">Not Graduate</option>
                   </select> : 
-                   <p className="w-full py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-xl shadow-sm focus:ring-2 hover:ring-sky-500 hover:border-sky-500 bg-white/70 dark:bg-gray-700/70 backdrop-blur-sm text-gray-900 dark:text-white transition-all duration-200">{profile?.education}</p>
+                   <p className="w-full py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-xl shadow-sm focus:ring-2 hover:ring-sky-500 hover:border-sky-500 input-field text-gray-900 dark:text-white transition-all duration-200">{profile?.education}</p>
                   }
                 </div>
               </div>
@@ -319,14 +319,14 @@ const ProfilePage: React.FC = () => {
                     name="employmentStatus"
                     value={profile?.employmentStatus}
                     onChange={handleChange}
-                    className="w-full h-12 px-4 border border-gray-300 dark:border-gray-600 rounded-xl shadow-sm focus:ring-2 focus:ring-sky-500 focus:border-sky-500 bg-white/70 dark:bg-gray-700/70 backdrop-blur-sm text-gray-900 dark:text-white transition-all duration-200"
+                    className="w-full h-12 px-4 border border-gray-300 dark:border-gray-600 rounded-xl shadow-sm focus:ring-2 focus:ring-sky-500 focus:border-sky-500 input-field text-gray-900 dark:text-white transition-all duration-200"
                   >
                     <option value="EMPLOYED">Employed</option>
                     <option value="SELF_EMPLOYED">Self-Employed</option>
                     <option value="UNEMPLOYED">Unemployed</option>
                     <option value="STUDENT">Student</option>
                   </select> : 
-                   <p className="w-full py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-xl shadow-sm focus:ring-2 hover:ring-sky-500 hover:border-sky-500 bg-white/70 dark:bg-gray-700/70 backdrop-blur-sm text-gray-900 dark:text-white transition-all duration-200">{profile?.employmentStatus}</p>
+                   <p className="w-full py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-xl shadow-sm focus:ring-2 hover:ring-sky-500 hover:border-sky-500 input-field text-gray-900 dark:text-white transition-all duration-200">{profile?.employmentStatus}</p>
                   }
                 </div>
 
@@ -345,9 +345,9 @@ const ProfilePage: React.FC = () => {
                       min="0"
                       value={profile?.income}
                       onChange={handleChange}
-                      className="w-full h-12 pl-8 pr-4 border border-gray-300 dark:border-gray-600 rounded-xl shadow-sm focus:ring-2 focus:ring-sky-500 focus:border-sky-500 bg-white/70 dark:bg-gray-700/70 backdrop-blur-sm text-gray-900 dark:text-white transition-all duration-200"
+                      className="w-full h-12 pl-8 pr-4 border border-gray-300 dark:border-gray-600 rounded-xl shadow-sm focus:ring-2 focus:ring-sky-500 focus:border-sky-500 input-field text-gray-900 dark:text-white transition-all duration-200"
                       placeholder="0.00"
-                    /> : <p className="w-full py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-xl shadow-sm focus:ring-2 hover:ring-sky-500 hover:border-sky-500 bg-white/70 dark:bg-gray-700/70 backdrop-blur-sm text-gray-900 dark:text-white transition-all duration-200">{profile?.income}</p>}
+                    /> : <p className="w-full py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-xl shadow-sm focus:ring-2 hover:ring-sky-500 hover:border-sky-500 input-field text-gray-900 dark:text-white transition-all duration-200">{profile?.income}</p>}
                   </div>
                 </div>
                 
@@ -366,9 +366,9 @@ const ProfilePage: React.FC = () => {
                       min="0"
                       value={profile?.coApplicantIncome}
                       onChange={handleChange}
-                      className="w-full h-12 pl-8 pr-4 border border-gray-300 dark:border-gray-600 rounded-xl shadow-sm focus:ring-2 focus:ring-sky-500 focus:border-sky-500 bg-white/70 dark:bg-gray-700/70 backdrop-blur-sm text-gray-900 dark:text-white transition-all duration-200"
+                      className="w-full h-12 pl-8 pr-4 border border-gray-300 dark:border-gray-600 rounded-xl shadow-sm focus:ring-2 focus:ring-sky-500 focus:border-sky-500 input-field text-gray-900 dark:text-white transition-all duration-200"
                       placeholder="0.00"
-                      /> : <p className="w-full py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-xl shadow-sm focus:ring-2 hover:ring-sky-500 hover:border-sky-500 bg-white/70 dark:bg-gray-700/70 backdrop-blur-sm text-gray-900 dark:text-white transition-all duration-200">{profile?.coApplicantIncome}</p>}
+                      /> : <p className="w-full py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-xl shadow-sm focus:ring-2 hover:ring-sky-500 hover:border-sky-500 input-field text-gray-900 dark:text-white transition-all duration-200">{profile?.coApplicantIncome}</p>}
                   </div>
                 </div>
                 
@@ -381,12 +381,12 @@ const ProfilePage: React.FC = () => {
                     name="propertyArea"
                     value={profile?.propertyArea}
                     onChange={handleChange}
-                    className="w-full h-12 px-4 border border-gray-300 dark:border-gray-600 rounded-xl shadow-sm focus:ring-2 focus:ring-sky-500 focus:border-sky-500 bg-white/70 dark:bg-gray-700/70 backdrop-blur-sm text-gray-900 dark:text-white transition-all duration-200"
+                    className="w-full h-12 px-4 border border-gray-300 dark:border-gray-600 rounded-xl shadow-sm focus:ring-2 focus:ring-sky-500 focus:border-sky-500 input-field text-gray-900 dark:text-white transition-all duration-200"
                   >
                     <option value="URBAN">Urban</option>
                     <option value="SEMIURBAN">Semi-Urban</option>
                     <option value="RURAL">Rural</option>
-                  </select> : <p className="w-full py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-xl shadow-sm focus:ring-2 hover:ring-sky-500 hover:border-sky-500 bg-white/70 dark:bg-gray-700/70 backdrop-blur-sm text-gray-900 dark:text-white transition-all duration-200">{profile?.propertyArea}</p>}
+                  </select> : <p className="w-full py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-xl shadow-sm focus:ring-2 hover:ring-sky-500 hover:border-sky-500 input-field text-gray-900 dark:text-white transition-all duration-200">{profile?.propertyArea}</p>}
                 </div>
               </div>
             </div>
@@ -417,14 +417,14 @@ const ProfilePage: React.FC = () => {
                     name="bankTransactions"
                     value={profile?.bankTransactions}
                     onChange={handleChange}
-                    className="w-full h-12 px-4 border border-gray-300 dark:border-gray-600 rounded-xl shadow-sm focus:ring-2 focus:ring-sky-500 focus:border-sky-500 bg-white/70 dark:bg-gray-700/70 backdrop-blur-sm text-gray-900 dark:text-white transition-all duration-200"
+                    className="w-full h-12 px-4 border border-gray-300 dark:border-gray-600 rounded-xl shadow-sm focus:ring-2 focus:ring-sky-500 focus:border-sky-500 input-field text-gray-900 dark:text-white transition-all duration-200"
                     required
                   >
                     <option value="NONE">None</option>
                     <option value="LESS_THAN_5">Less than 5</option>
                     <option value="OVER_5">Over 5</option>
                   </select> : 
-                   <p className="w-full py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-xl shadow-sm focus:ring-2 hover:ring-sky-500 hover:border-sky-500 bg-white/70 dark:bg-gray-700/70 backdrop-blur-sm text-gray-900 dark:text-white transition-all duration-200">{profile?.bankTransactions}</p>
+                   <p className="w-full py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-xl shadow-sm focus:ring-2 hover:ring-sky-500 hover:border-sky-500 input-field text-gray-900 dark:text-white transition-all duration-200">{profile?.bankTransactions}</p>
                   }
                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 transition-colors duration-300">
                     Including deposits, withdrawals, transfers, etc.
@@ -440,14 +440,14 @@ const ProfilePage: React.FC = () => {
                     name="lendingHistory"
                     value={profile?.lendingHistory}
                     onChange={handleChange}
-                    className="w-full h-12 px-4 border border-gray-300 dark:border-gray-600 rounded-xl shadow-sm focus:ring-2 focus:ring-sky-500 focus:border-sky-500 bg-white/70 dark:bg-gray-700/70 backdrop-blur-sm text-gray-900 dark:text-white transition-all duration-200"
+                    className="w-full h-12 px-4 border border-gray-300 dark:border-gray-600 rounded-xl shadow-sm focus:ring-2 focus:ring-sky-500 focus:border-sky-500 input-field text-gray-900 dark:text-white transition-all duration-200"
                     required
                   >
                     <option value="NONE">None</option>
                     <option value="LESS_THAN_5">Less than 5</option>
                     <option value="OVER_5">Over 5</option>
                   </select> : 
-                  <p className="w-full py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-xl shadow-sm focus:ring-2 hover:ring-sky-500 hover:border-sky-500 bg-white/70 dark:bg-gray-700/70 backdrop-blur-sm text-gray-900 dark:text-white transition-all duration-200">{profile?.lendingHistory}</p>
+                  <p className="w-full py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-xl shadow-sm focus:ring-2 hover:ring-sky-500 hover:border-sky-500 input-field text-gray-900 dark:text-white transition-all duration-200">{profile?.lendingHistory}</p>
                   }
                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 transition-colors duration-300">
                     From banks, friends, family, or institutions
@@ -463,7 +463,7 @@ const ProfilePage: React.FC = () => {
                     name="loanPurpose"
                     value={profile?.loanPurpose}
                     onChange={handleChange}
-                    className="w-full h-12 px-4 border border-gray-300 dark:border-gray-600 rounded-xl shadow-sm focus:ring-2 focus:ring-sky-500 focus:border-sky-500 bg-white/70 dark:bg-gray-700/70 backdrop-blur-sm text-gray-900 dark:text-white transition-all duration-200"
+                    className="w-full h-12 px-4 border border-gray-300 dark:border-gray-600 rounded-xl shadow-sm focus:ring-2 focus:ring-sky-500 focus:border-sky-500 input-field text-gray-900 dark:text-white transition-all duration-200"
                     required
                   >
                     <option value="BUSINESS_INVESTMENT">Business Investment</option>
@@ -474,7 +474,7 @@ const ProfilePage: React.FC = () => {
                     <option value="MEDICAL_EMERGENCY">Medical Emergency</option>
                     <option value="OTHER">Other</option>
                   </select> : 
-                   <p className="w-full py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-xl shadow-sm focus:ring-2 hover:ring-sky-500 hover:border-sky-500 bg-white/70 dark:bg-gray-700/70 backdrop-blur-sm text-gray-900 dark:text-white transition-all duration-200">{profile?.loanPurpose}</p>
+                   <p className="w-full py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-xl shadow-sm focus:ring-2 hover:ring-sky-500 hover:border-sky-500 input-field text-gray-900 dark:text-white transition-all duration-200">{profile?.loanPurpose}</p>
                   }
                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 transition-colors duration-300">
                     This helps us understand your financial priorities and risk profile

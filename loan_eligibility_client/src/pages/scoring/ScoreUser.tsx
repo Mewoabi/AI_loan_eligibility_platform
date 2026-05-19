@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { searchUsers, performCreditScore } from '../../services/api';
+import { searchUsers, performCreditScore, getApiErrorMessage } from '../../services/api';
 import { useToast } from '../../context/toastContext';
 import { useData } from '../../context/DataContext';
 import { useAuth } from '../../context/AuthContext';
@@ -258,14 +258,9 @@ const ScoreUser: React.FC = () => {
       const result: LoanPredictionResult = processScoreResult(response.data as LoanPredictionResult)
       console.log(result)
       setScoreResult(result);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Scoring failed:', error);
-      // showToast('Failed to perform scoring. Please check your inputs and try again.', 'error');
-      if (Array.isArray(error.response.data.detail)) {
-        showToast(`${error.response.data.detail[0].loc[1]} ${error.response.data.detail[0].msg}`, 'error');
-      } else {
-        if (error.response.data.detail && typeof error.response.data.detail === 'string') showToast(error.response.data.detail)
-      }
+      showToast(getApiErrorMessage(error, 'Failed to perform scoring. Please check your inputs.'), 'error');
     } finally {
       setIsScoring(false);
     }
@@ -289,13 +284,9 @@ const ScoreUser: React.FC = () => {
       });
       setDecisionSaving(false)
       navigate('/my-scores');
-    } catch (error: any) {
+    } catch (error: unknown) {
       setDecisionSaving(false)
-      if (Array.isArray(error.response.data.detail)) {
-        showToast(`${error.response.data.detail[0].loc[1]} ${error.response.data.detail[0].msg}`, 'error');
-      } else {
-        if (error.response.data.detail && typeof error.response.data.detail === 'string') showToast(error.response.data.detail)
-      }
+      showToast(getApiErrorMessage(error, 'Failed to save score'), 'error');
       console.error('Failed to save score:', error);
     }
   };
@@ -330,7 +321,7 @@ const ScoreUser: React.FC = () => {
 
   return (
     <div className="max-w-4xl mx-auto py-6 px-4 sm:px-6 lg:px-8 box-content">
-      <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-6 transition-colors duration-300">
+      <div className="surface-card rounded-lg p-6 transition-colors duration-300">
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 transition-colors duration-300">Perform Credit Scoring</h1>
 
         {!scoreResult && (
@@ -406,7 +397,7 @@ const ScoreUser: React.FC = () => {
                     <select
                       value={scoreData.gender}
                       onChange={(e) => handleInputChange('gender', e.target.value)}
-                      className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-sky-500 focus:border-transparent transition-colors duration-300"
+                      className="input-field"
                     >
                       <option value="">Select Gender</option>
                       <option value="Male">Male</option>
@@ -419,7 +410,7 @@ const ScoreUser: React.FC = () => {
                     <select
                       value={scoreData.maritalStatus}
                       onChange={(e) => handleInputChange('maritalStatus', e.target.value)}
-                      className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-sky-500 focus:border-transparent transition-colors duration-300"
+                      className="input-field"
                     >
                       <option value="">Select Status</option>
                       <option value="Single">Single</option>
@@ -436,7 +427,7 @@ const ScoreUser: React.FC = () => {
                       min="0"
                       value={scoreData.dependents}
                       onChange={(e) => handleInputChange('dependents', parseInt(e.target.value) || 0)}
-                      className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-sky-500 focus:border-transparent transition-colors duration-300"
+                      className="input-field"
                     />
                   </div>
 
@@ -445,7 +436,7 @@ const ScoreUser: React.FC = () => {
                     <select
                       value={scoreData.education}
                       onChange={(e) => handleInputChange('education', e.target.value)}
-                      className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-sky-500 focus:border-transparent transition-colors duration-300"
+                      className="input-field"
                     >
                       <option value="">Select Education</option>
                       <option value="Graduate">Graduate</option>
@@ -458,7 +449,7 @@ const ScoreUser: React.FC = () => {
                     <select
                       value={scoreData.employmentStatus}
                       onChange={(e) => handleInputChange('employmentStatus', e.target.value)}
-                      className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-sky-500 focus:border-transparent transition-colors duration-300"
+                      className="input-field"
                     >
                       <option value="">Select Employment</option>
                       <option value="Employed">Employed</option>
@@ -474,7 +465,7 @@ const ScoreUser: React.FC = () => {
                       min="0"
                       value={scoreData.income}
                       onChange={(e) => handleInputChange('income', parseFloat(e.target.value) || 0)}
-                      className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-sky-500 focus:border-transparent transition-colors duration-300"
+                      className="input-field"
                     />
                   </div>
 
@@ -485,7 +476,7 @@ const ScoreUser: React.FC = () => {
                       min="0"
                       value={scoreData.coApplicantIncome}
                       onChange={(e) => handleInputChange('coApplicantIncome', parseFloat(e.target.value) || 0)}
-                      className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-sky-500 focus:border-transparent transition-colors duration-300"
+                      className="input-field"
                     />
                   </div>
 
@@ -496,7 +487,7 @@ const ScoreUser: React.FC = () => {
                       min="0"
                       value={scoreData.loanAmount}
                       onChange={(e) => handleInputChange('loanAmount', parseFloat(e.target.value) || 0)}
-                      className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-sky-500 focus:border-transparent transition-colors duration-300"
+                      className="input-field"
                     />
                   </div>
 
@@ -507,7 +498,7 @@ const ScoreUser: React.FC = () => {
                       min="1"
                       value={scoreData.loanTerm}
                       onChange={(e) => handleInputChange('loanTerm', parseInt(e.target.value) || 12)}
-                      className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-sky-500 focus:border-transparent transition-colors duration-300"
+                      className="input-field"
                     />
                   </div>
 
@@ -516,7 +507,7 @@ const ScoreUser: React.FC = () => {
                     <select
                       value={scoreData.propertyArea}
                       onChange={(e) => handleInputChange('propertyArea', e.target.value)}
-                      className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-sky-500 focus:border-transparent transition-colors duration-300"
+                      className="input-field"
                     >
                       <option value="">Select Area</option>
                       <option value="Urban">Urban</option>
@@ -550,7 +541,7 @@ const ScoreUser: React.FC = () => {
                       <select
                         value={scoreData.bankTransactions}
                         onChange={(e) => handleInputChange('bankTransactions', e.target.value)}
-                        className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-sky-500 focus:border-transparent transition-colors duration-300"
+                        className="input-field"
                       >
                         <option value="NONE">None</option>
                         <option value="LESS_THAN_5">Less than 5</option>
@@ -568,7 +559,7 @@ const ScoreUser: React.FC = () => {
                       <select
                         value={scoreData.lendingHistory}
                         onChange={(e) => handleInputChange('lendingHistory', e.target.value)}
-                        className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-sky-500 focus:border-transparent transition-colors duration-300"
+                        className="input-field"
                       >
                         <option value="NONE">None</option>
                         <option value="LESS_THAN_5">Less than 5</option>
@@ -586,7 +577,7 @@ const ScoreUser: React.FC = () => {
                       <select
                         value={scoreData.loanPurpose}
                         onChange={(e) => handleInputChange('loanPurpose', e.target.value)}
-                        className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-sky-500 focus:border-transparent transition-colors duration-300"
+                        className="input-field"
                       >
                         <option value="BUSINESS_INVESTMENT">Business Investment</option>
                         <option value="RENTS_AND_BILLS">Rents and Bills</option>
@@ -720,7 +711,7 @@ const ScoreUser: React.FC = () => {
                         min="0"
                         value={loanDecision.awardedAmount}
                         onChange={(e) => setLoanDecision(prev => ({ ...prev, awardedAmount: parseFloat(e.target.value) || 0 }))}
-                        className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-sky-500 focus:border-transparent transition-colors duration-300"
+                        className="input-field"
                       />
                     </div>
                     <div>
@@ -729,7 +720,7 @@ const ScoreUser: React.FC = () => {
                         type="date"
                         value={loanDecision.dueDate || new Date().toISOString().split('T')[0]}
                         onChange={(e) => setLoanDecision(prev => ({ ...prev, dueDate: e.target.value }))}
-                        className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-sky-500 focus:border-transparent transition-colors duration-300"
+                        className="input-field"
                       />
                     </div>
                   </div>

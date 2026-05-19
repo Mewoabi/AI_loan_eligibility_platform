@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { getPendingLoanApplications } from '../../services/api';
+import { getPendingLoanApplications, getApiErrorMessage } from '../../services/api';
+import { AppLayout } from '../../layouts/AppLayout';
 
 type LoanApplication = {
   id: string;
@@ -48,7 +49,7 @@ const ScoreApplications: React.FC = () => {
         const response = await getPendingLoanApplications();
         setApplications(response.data);
       } catch (err: any) {
-        setError(err.response?.data?.detail || 'Failed to load pending loan applications');
+        setError(getApiErrorMessage(err, 'Failed to load pending loan applications'));
         console.error(err);
       } finally {
         setIsLoading(false);
@@ -107,16 +108,13 @@ const ScoreApplications: React.FC = () => {
   }
 
   return (
-    <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-      <div className="px-4 py-6 sm:px-0">
-        <div className="bg-white shadow overflow-hidden sm:rounded-lg">
-          <div className="px-4 py-5 sm:px-6 bg-gradient-to-r from-blue-600 to-indigo-700">
-            <h3 className="text-lg leading-6 font-medium text-white">
-              Score Loan Applications
-            </h3>
-            <p className="mt-1 max-w-2xl text-sm text-blue-100">
-              Review and score pending loan applications from other users
-            </p>
+    <AppLayout
+      title="Score Loan Applications"
+      description="Review and score pending loan applications from other users"
+    >
+        <div className="surface-card overflow-hidden">
+          <div className="px-4 py-5 sm:px-6 bg-gradient-to-r from-sky-500 to-teal-500 rounded-t-2xl">
+            <p className="text-sm text-sky-100">Filter and review pending borrower applications</p>
           </div>
           
           {error && (
@@ -149,7 +147,7 @@ const ScoreApplications: React.FC = () => {
                     placeholder="Search by name or ID"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-10 sm:text-sm border-gray-300 rounded-md"
+                    className="input-field pl-10"
                   />
                 </div>
               </div>
@@ -159,7 +157,7 @@ const ScoreApplications: React.FC = () => {
                 <select
                   value={selectedFilter}
                   onChange={(e) => setSelectedFilter(e.target.value as any)}
-                  className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+                  className="select-field"
                 >
                   <option value="recent">Most Recent</option>
                   <option value="amount_high">Amount (High to Low)</option>
@@ -233,7 +231,7 @@ const ScoreApplications: React.FC = () => {
                       <div className="mt-4 sm:mt-0">
                         <button
                           onClick={() => navigate(`/loans/${application.id}?score=true`)}
-                          className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                          className="btn-primary text-sm"
                         >
                           Review & Score
                         </button>
@@ -265,8 +263,7 @@ const ScoreApplications: React.FC = () => {
             </ul>
           )}
         </div>
-      </div>
-    </div>
+    </AppLayout>
   );
 };
 

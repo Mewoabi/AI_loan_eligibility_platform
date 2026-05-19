@@ -253,6 +253,10 @@ The seeded dataset includes **18 credit assessments** spanning:
 | Variable | Description |
 |----------|-------------|
 | `DATABASE_URL` | PostgreSQL connection string (Prisma format) |
+| `HEALTH_DB_MAX_ATTEMPTS` | Optional. DB ping retries on `/health` (default `5`) |
+| `HEALTH_DB_RETRY_DELAY_SEC` | Optional. Seconds between retries (default `2.0`) |
+| `DB_CONNECT_TIMEOUT_SEC` | Optional. Max seconds to wait for a DB connection (default `10`) |
+| `REQUEST_TIMEOUT_SEC` | Optional. Max seconds per HTTP request on the API (default `60`) |
 
 Example:
 
@@ -265,6 +269,7 @@ DATABASE_URL="postgresql://USER:PASSWORD@HOST:5432/DATABASE?sslmode=require"
 | Variable | Description |
 |----------|-------------|
 | `VITE_API_URL` | Base URL of the FastAPI backend |
+| `VITE_API_TIMEOUT_MS` | Optional. Axios request timeout in ms (default `30000`) |
 
 Example:
 
@@ -295,7 +300,7 @@ Full interactive documentation is available at `/docs` when the server is runnin
 | `PUT` | `/scoring/{scoreId}/status` | JWT | Update decision / outcome |
 | `DELETE` | `/scoring/{scoreId}` | JWT | Delete an assessment |
 | `GET` | `/dashboard/stats` | JWT | Dashboard statistics |
-| `GET` | `/health` | — | Health check |
+| `GET` | `/health` | — | Health check (DB ping with cold-start retries; `503` if DB down) |
 
 ---
 
@@ -367,6 +372,7 @@ Ensure `DATABASE_URL`, the ML model file, and any required migrations are availa
 | `uvicorn main:app --reload` | `loan_eligibility_server` | Start API with hot reload |
 | `.\dev.ps1` | `loan_eligibility_server` | Generate Prisma client + start API (Windows) |
 | `python seed_demo_data.py` | `loan_eligibility_server` | Seed demo users and assessments |
+| `python verify_endpoints.py` | `loan_eligibility_server` | Smoke-test all API endpoints |
 | `prisma migrate dev` | `loan_eligibility_server` | Apply migrations |
 | `prisma generate` | `loan_eligibility_server` | Regenerate Prisma Python client |
 
